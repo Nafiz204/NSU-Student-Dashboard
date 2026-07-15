@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CourseMap — BSCSE Academic Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0F1B2E;
+    --panel: #16273F;
+    --panel-2: #1C3050;
+    --grid: #21385A;
+    --line: #2B4A73;
+    --ink: #EAF2FF;
+    --ink-dim: #8CA3C4;
+    --ink-faint: #5A7096;
+    --amber: #E8A33D;
+    --amber-dim: #B98230;
+    --trace: #6FCF97;
+    --rust: #E8664A;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    min-height:100vh;
+  }
+  ::selection{background:var(--amber); color:#0F1B2E;}
+
+  a{color:var(--amber);}
+
+  /* ---------- header ---------- */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 28px; border-bottom:1px solid var(--line);
+    background:rgba(15,27,46,0.85); backdrop-filter:blur(6px);
+    position:sticky; top:0; z-index:10;
+    flex-wrap:wrap; gap:14px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:36px; height:36px; border:1.5px solid var(--amber); border-radius:4px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:13px; color:var(--amber); font-weight:600;
+    position:relative;
+  }
+  .brand-mark::before, .brand-mark::after{
+    content:""; position:absolute; background:var(--amber-dim); opacity:.6;
+  }
+  .brand-mark::before{ width:10px; height:1px; left:-10px; top:50%; }
+  .brand-mark::after{ width:1px; height:10px; left:50%; bottom:-10px; }
+  .brand h1{font-family:var(--font-display); font-size:19px; margin:0; letter-spacing:.02em; font-weight:600;}
+  .brand p{margin:0; font-size:12px; color:var(--ink-dim); font-family:var(--font-mono);}
+
+  .header-gauge{display:flex; gap:22px; align-items:center;}
+  .badge{
+    font-family:var(--font-mono); font-size:11px; color:var(--ink-faint);
+    display:flex; flex-direction:column; align-items:flex-end; gap:2px;
+  }
+  .badge b{font-family:var(--font-display); font-size:22px; color:var(--amber); font-weight:600;}
+
+  .io-buttons{display:flex; gap:8px; padding-left:18px; border-left:1px solid var(--line);}
+  .io-btn{
+    font-family:var(--font-mono); font-size:11.5px; background:none; border:1px solid var(--line);
+    color:var(--ink-dim); padding:8px 12px; border-radius:4px; cursor:pointer; letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .io-btn:hover{border-color:var(--amber); color:var(--amber);}
+
+  .major-switch{display:flex; align-items:center; gap:8px; padding-right:18px; border-right:1px solid var(--line);}
+  .major-switch label{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;}
+  .major-switch select{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink); font-family:var(--font-body);
+    font-size:12.5px; padding:7px 10px; border-radius:4px; max-width:260px;
+  }
+  .major-switch select:focus{outline:none; border-color:var(--amber);}
+
+  /* ---------- nav ---------- */
+  nav{
+    display:flex; gap:2px; padding:0 28px; border-bottom:1px solid var(--line);
+    background:rgba(15,27,46,0.6); overflow-x:auto;
+  }
+  nav button{
+    background:none; border:none; color:var(--ink-dim); font-family:var(--font-mono);
+    font-size:12.5px; padding:14px 16px; cursor:pointer; letter-spacing:.03em;
+    border-bottom:2px solid transparent; white-space:nowrap;
+    text-transform:uppercase;
+  }
+  nav button.active{color:var(--amber); border-bottom-color:var(--amber);}
+  nav button:hover{color:var(--ink);}
+
+  main{max-width:1180px; margin:0 auto; padding:28px;}
+  section.view{display:none;}
+  section.view.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  h2.section-title{
+    font-family:var(--font-display); font-size:15px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--ink-dim); margin:0 0 16px 0;
+    display:flex; align-items:center; gap:10px;
+  }
+  h2.section-title::after{content:""; height:1px; flex:1; background:var(--line);}
+
+  .grid-cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:14px; margin-bottom:32px;}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:18px;
+    position:relative; overflow:hidden;
+  }
+  .card::before{content:""; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--amber); opacity:.55;}
+  .card .label{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em;}
+  .card .value{font-family:var(--font-display); font-size:32px; font-weight:600; margin:6px 0 2px;}
+  .card .sub{font-size:12px; color:var(--ink-dim);}
+  .card.trace::before{background:var(--trace);}
+  .card.warn::before{background:var(--rust);}
+
+  /* gauge */
+  .gauge-wrap{display:flex; gap:28px; flex-wrap:wrap; align-items:center; margin-bottom:32px;}
+  .gauge-box{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:20px 24px; display:flex; gap:24px; align-items:center; flex:1; min-width:280px;}
+  .gauge-box svg{flex-shrink:0;}
+  .gauge-text .num{font-family:var(--font-display); font-size:38px; font-weight:700; color:var(--amber);}
+  .gauge-text .cap{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em; margin-top:4px;}
+
+  /* category bars */
+  .cat-row{margin-bottom:14px;}
+  .cat-row .top{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim); margin-bottom:6px;}
+  .cat-row .top b{color:var(--ink);}
+  .bar{height:8px; background:var(--panel-2); border-radius:4px; overflow:hidden; border:1px solid var(--line);}
+  .bar > i{display:block; height:100%; background:linear-gradient(90deg, var(--amber-dim), var(--amber)); border-radius:4px;}
+
+  /* table */
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th{
+    text-align:left; font-family:var(--font-mono); font-size:11px; color:var(--ink-faint);
+    text-transform:uppercase; letter-spacing:.05em; padding:10px 12px; border-bottom:1px solid var(--line);
+  }
+  td{padding:10px 12px; border-bottom:1px solid var(--grid); vertical-align:middle;}
+  tr.retake-old td{opacity:.45; text-decoration:line-through; font-style:italic;}
+  .code{font-family:var(--font-mono); color:var(--ink);}
+  .pill{
+    display:inline-block; font-family:var(--font-mono); font-size:11px; padding:2px 8px; border-radius:999px;
+    border:1px solid var(--line); color:var(--ink-dim);
+  }
+  .pill.ok{color:var(--trace); border-color:var(--trace);}
+  .pill.lock{color:var(--ink-faint); border-color:var(--ink-faint);}
+  .pill.warn{color:var(--rust); border-color:var(--rust);}
+  .pill.avail{color:var(--amber); border-color:var(--amber);}
+
+  button.action{
+    font-family:var(--font-mono); font-size:11px; background:none; border:1px solid var(--line);
+    color:var(--ink-dim); padding:5px 10px; border-radius:4px; cursor:pointer; margin-right:6px;
+  }
+  button.action:hover{border-color:var(--amber); color:var(--amber);}
+  button.primary{
+    font-family:var(--font-mono); font-size:12.5px; background:var(--amber); color:#0F1B2E;
+    border:none; padding:10px 18px; border-radius:4px; cursor:pointer; font-weight:600; letter-spacing:.02em;
+  }
+  button.primary:hover{background:#f3b559;}
+
+  .toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:12px; flex-wrap:wrap;}
+
+  /* curriculum */
+  .cat-block{margin-bottom:26px;}
+  .cat-header{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
+  .cat-header h3{font-family:var(--font-display); font-size:15px; margin:0; font-weight:600;}
+  .cat-header span{font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint);}
+  .course-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:8px;}
+  .course-tile{
+    background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:10px 12px;
+    font-size:12.5px; position:relative;
+  }
+  .course-tile .code{font-weight:600; font-size:13px;}
+  .course-tile .name{color:var(--ink-dim); font-size:11.5px; margin:3px 0 6px; line-height:1.3;}
+  .course-tile .meta{display:flex; justify-content:space-between; align-items:center;}
+  .course-tile.done{border-color:var(--trace);}
+  .course-tile.locked{opacity:.5;}
+  .course-tile.avail{border-color:var(--amber);}
+  .course-tile.retake{border-color:var(--rust);}
+  .trail-segment{margin-bottom:16px;}
+  .trail-segment-header{
+    font-family:var(--font-mono); font-size:11.5px; color:var(--amber); text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:8px; padding-left:10px; border-left:2px solid var(--amber);
+  }
+
+  /* modal */
+  .overlay{position:fixed; inset:0; background:rgba(6,12,22,.7); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;}
+  .overlay.show{display:flex;}
+  .modal{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:26px; width:100%; max-width:440px;}
+  .modal h3{font-family:var(--font-display); margin:0 0 18px; font-size:17px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px;}
+  .field input, .field select{
+    width:100%; background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    padding:9px 10px; border-radius:4px; font-family:var(--font-body); font-size:13.5px;
+  }
+  .field input:focus, .field select:focus{outline:none; border-color:var(--amber);}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:20px;}
+  .ghost-btn{background:none; border:1px solid var(--line); color:var(--ink-dim); padding:9px 16px; border-radius:4px; font-family:var(--font-mono); font-size:12.5px; cursor:pointer;}
+
+  .empty-note{color:var(--ink-faint); font-size:13px; font-family:var(--font-mono); padding:20px 0;}
+
+  .rec-sem{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px; margin-bottom:14px;}
+  .rec-sem h4{font-family:var(--font-display); margin:0 0 4px; font-size:15px; display:flex; justify-content:space-between;}
+  .rec-sem h4 span{color:var(--ink-faint); font-family:var(--font-mono); font-size:11.5px; font-weight:400;}
+  .rec-list{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:6px;}
+  .rec-list li{display:flex; justify-content:space-between; font-size:13px; padding:8px 10px; background:var(--panel-2); border-radius:4px; border-left:2px solid var(--amber);}
+  .rec-list li .why{color:var(--ink-faint); font-size:11px; font-family:var(--font-mono);}
+
+  footer{text-align:center; padding:26px; color:var(--ink-faint); font-family:var(--font-mono); font-size:11px; border-top:1px solid var(--line); margin-top:20px;}
+
+  select#gradeFilter{width:auto;}
+  .flex-between{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;}
+
+  @media (max-width:640px){
+    header{padding:16px;}
+    main{padding:16px;}
+    table{font-size:12px;}
+    th,td{padding:8px 6px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">CM</div>
+    <div>
+      <h1>CourseMap</h1>
+      <p>NSU · School of Engineering &amp; Physical Sciences · BSCSE</p>
+    </div>
+  </div>
+  <div class="header-gauge">
+    <div class="major-switch">
+      <label>Major</label>
+      <select id="majorSelect"></select>
+    </div>
+    <div class="badge">CGPA<b id="hdrCgpa">0.00</b></div>
+    <div class="badge">Credits<b id="hdrCredits">0</b></div>
+    <div class="io-buttons">
+      <button class="io-btn" id="btnExport" title="Download all your data as a backup file">⭳ Export</button>
+      <button class="io-btn" id="btnImport" title="Restore data from a backup file">⭱ Import</button>
+      <input type="file" id="fileImport" accept="application/json" style="display:none;">
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" data-view="overview">Overview</button>
+  <button class="nav-btn" data-view="history">Grade History</button>
+  <button class="nav-btn" data-view="curriculum">Curriculum Map</button>
+  <button class="nav-btn" data-view="major">Majors</button>
+  <button class="nav-btn" data-view="recommend">Recommendations</button>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <section class="view active" id="view-overview">
+    <h2 class="section-title">Snapshot</h2>
+    <div class="gauge-wrap">
+      <div class="gauge-box">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#21385A" stroke-width="10"/>
+          <circle id="cgpaRing" cx="60" cy="60" r="50" fill="none" stroke="#E8A33D" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"
+                  transform="rotate(-90 60 60)"/>
+          <text x="60" y="56" text-anchor="middle" fill="#EAF2FF" font-family="Space Grotesk" font-size="22" font-weight="700" id="cgpaRingText">0.00</text>
+          <text x="60" y="74" text-anchor="middle" fill="#5A7096" font-family="IBM Plex Mono" font-size="9" letter-spacing="1">CGPA / 4.00</text>
+        </svg>
+        <div class="gauge-text">
+          <div class="num" id="creditsEarnedNum">0 / 130</div>
+          <div class="cap">Credits earned toward degree</div>
+        </div>
+      </div>
+      <div class="gauge-box">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#21385A" stroke-width="10"/>
+          <circle id="progRing" cx="60" cy="60" r="50" fill="none" stroke="#6FCF97" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"
+                  transform="rotate(-90 60 60)"/>
+          <text x="60" y="56" text-anchor="middle" fill="#EAF2FF" font-family="Space Grotesk" font-size="20" font-weight="700" id="progRingText">0%</text>
+          <text x="60" y="74" text-anchor="middle" fill="#5A7096" font-family="IBM Plex Mono" font-size="9" letter-spacing="1">DEGREE COMPLETE</text>
+        </svg>
+        <div class="gauge-text">
+          <div class="num" id="semEstimate">—</div>
+          <div class="cap">Est. semesters remaining</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-cards" id="statCards"></div>
+
+    <h2 class="section-title">Credit Progress by Category</h2>
+    <div id="categoryBars"></div>
+  </section>
+
+  <!-- GRADE HISTORY -->
+  <section class="view" id="view-history">
+    <div class="toolbar">
+      <h2 class="section-title" style="margin:0; flex:1;">Grade History</h2>
+      <button class="primary" id="btnAddGrade">+ Add Course Record</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="historyTable">
+        <thead>
+          <tr><th>Semester</th><th>Code</th><th>Course</th><th>Credits</th><th>Grade</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+    <div class="empty-note" id="historyEmpty" style="display:none;">No records yet. Add your first completed or in-progress course above.</div>
+  </section>
+
+  <!-- CURRICULUM -->
+  <section class="view" id="view-curriculum">
+    <h2 class="section-title" id="curriculumTitle">Curriculum Map</h2>
+    <p style="color:var(--ink-dim); font-size:12.5px; margin-top:-8px;">
+      Built from the ECE Department's published BSCSE curriculum (or your own custom major). Elective trails and course offerings
+      can shift by catalog year — cross-check anything borderline against your official advising sheet in RDS.
+    </p>
+    <div id="curriculumBody"></div>
+  </section>
+
+  <!-- MAJORS -->
+  <section class="view" id="view-major">
+    <h2 class="section-title">Majors</h2>
+    <p style="color:var(--ink-dim); font-size:12.5px; margin-top:-8px;">
+      Switch which major's requirements power the Curriculum Map and Recommendations tabs. Your Grade History stays the same —
+      only the degree checklist changes. Build a custom major from scratch, or duplicate an existing one to tweak.
+    </p>
+
+    <div class="grid-cards" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="label">Active Major</div>
+        <div class="value" id="activeMajorName" style="font-size:19px;">—</div>
+        <div class="sub" id="activeMajorSub">—</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="primary" id="btnNewMajor">+ New Custom Major</button>
+        <button class="ghost-btn" id="btnDuplicateMajor">Duplicate Active Major as Custom</button>
+        <button class="ghost-btn" id="btnDeleteMajor" style="border-color:var(--rust); color:var(--rust); display:none;">Delete This Major</button>
+      </div>
+    </div>
+
+    <div id="majorEditor"></div>
+  </section>
+
+  <!-- RECOMMENDATIONS -->
+  <section class="view" id="view-recommend">
+    <div class="flex-between" style="margin-bottom:8px;">
+      <h2 class="section-title" style="margin:0;">Course Recommendations</h2>
+      <div class="field" style="margin:0; width:170px;">
+        <label>Target credits / semester</label>
+        <input type="number" id="targetCredits" min="3" max="19" step="1" value="15">
+      </div>
+    </div>
+    <div id="recBody"></div>
+  </section>
+
+</main>
+
+<footer>Data is stored only in this browser (localStorage) — nothing is sent anywhere. Export/back up manually if you switch devices.</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Add Course Record</h3>
+    <div class="field">
+      <label>Course</label>
+      <select id="fCourse"></select>
+    </div>
+    <div class="field">
+      <label>Semester</label>
+      <select id="fSemester"></select>
+    </div>
+    <div class="field">
+      <label>Grade</label>
+      <select id="fGrade"></select>
+    </div>
+    <input type="hidden" id="fRecordId">
+    <div class="modal-actions">
+      <button class="ghost-btn" id="btnCancel">Cancel</button>
+      <button class="primary" id="btnSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW MAJOR MODAL -->
+<div class="overlay" id="majorOverlay">
+  <div class="modal">
+    <h3>New Custom Major</h3>
+    <div class="field">
+      <label>Major name</label>
+      <input type="text" id="mNewName" placeholder="e.g. BSEEE — Electrical &amp; Electronic Engineering">
+    </div>
+    <div class="field">
+      <label>Total credits required</label>
+      <input type="number" id="mNewTotalCredits" min="1" step="1" value="130">
+    </div>
+    <div class="modal-actions">
+      <button class="ghost-btn" id="btnMajorCancel">Cancel</button>
+      <button class="primary" id="btnMajorCreate">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- COURSE FORM MODAL (for custom majors) -->
+<div class="overlay" id="courseOverlay">
+  <div class="modal">
+    <h3 id="courseModalTitle">Add Course</h3>
+    <div class="field">
+      <label>Course Code</label>
+      <input type="text" id="ccCode" placeholder="e.g. EEE111">
+    </div>
+    <div class="field">
+      <label>Course Name</label>
+      <input type="text" id="ccName" placeholder="e.g. Analog Electronics I">
+    </div>
+    <div class="field">
+      <label>Credits</label>
+      <input type="number" id="ccCredits" min="0" step="0.5" value="3">
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <input type="text" id="ccCategory" list="ccCategoryList" placeholder="e.g. Major Core">
+      <datalist id="ccCategoryList"></datalist>
+    </div>
+    <div class="field">
+      <label>Category target credits (total needed in this category)</label>
+      <input type="number" id="ccCategoryTarget" min="0" step="1" placeholder="Leave blank to keep existing">
+    </div>
+    <div class="field">
+      <label>Prerequisites (comma-separated course codes, optional)</label>
+      <input type="text" id="ccPrereqs" placeholder="e.g. MAT120, PHY107">
+    </div>
+    <div class="field">
+      <label>Elective trail (optional — only if courses in this category split into trails to choose from)</label>
+      <input type="text" id="ccTrail" placeholder="e.g. Artificial Intelligence">
+    </div>
+    <input type="hidden" id="ccOriginalCode">
+    <div class="modal-actions">
+      <button class="ghost-btn" id="btnCourseCancel">Cancel</button>
+      <button class="primary" id="btnCourseSave">Save Course</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   COURSE DATABASE — NSU BSCSE, 130-credit curriculum
+   (effective Fall 2014 catalog, applies to Summer 2022 admits)
+   ========================================================= */
+const BSCSE_COURSES = [
+  // ---- University Core (34) ----
+  {code:'ENG102', name:'Introduction to Composition', credits:3, cat:'University Core', pre:[]},
+  {code:'ENG103', name:'Intermediate Composition', credits:3, cat:'University Core', pre:['ENG102']},
+  {code:'ENG111', name:'Public Speaking', credits:3, cat:'University Core', pre:['ENG103']},
+  {code:'BEN205', name:'Bangla Language', credits:3, cat:'University Core', pre:[]},
+  {code:'PHI104', name:'Introduction to Ethics', credits:3, cat:'University Core', pre:[]},
+  {code:'HIS102', name:'Introduction to World Civilization', credits:3, cat:'University Core', pre:[]},
+  {code:'HIS103', name:'Emergence of Bangladesh', credits:3, cat:'University Core', pre:[]},
+  {code:'ECO101', name:'Introduction to Microeconomics', credits:3, cat:'University Core', pre:[], group:'socsci1'},
+  {code:'ECO104', name:'Introduction to Macroeconomics', credits:3, cat:'University Core', pre:[], group:'socsci1'},
+  {code:'POL101', name:'Introduction to Political Science', credits:3, cat:'University Core', pre:[], group:'socsci2'},
+  {code:'POL104', name:'Introduction to Governance', credits:3, cat:'University Core', pre:[], group:'socsci2'},
+  {code:'SOC101', name:'Introduction to Sociology', credits:3, cat:'University Core', pre:[], group:'socsci3'},
+  {code:'ANT101', name:'Introduction to Anthropology', credits:3, cat:'University Core', pre:[], group:'socsci3'},
+  {code:'ENV203', name:'Introduction to Bangladesh Geography', credits:3, cat:'University Core', pre:[], group:'socsci3'},
+  {code:'BIO103', name:'Biology I', credits:3, cat:'University Core', pre:[]},
+  {code:'BIO103L', name:'Biology I Lab', credits:1, cat:'University Core', pre:[], pairWith:'BIO103'},
+
+  // ---- SEPS Core (38) ----
+  {code:'MAT116', name:'Pre-Calculus', credits:0, cat:'SEPS Core', pre:[]},
+  {code:'MAT120', name:'Calculus I', credits:3, cat:'SEPS Core', pre:['MAT116']},
+  {code:'MAT130', name:'Calculus II', credits:3, cat:'SEPS Core', pre:['MAT120']},
+  {code:'MAT250', name:'Calculus III', credits:3, cat:'SEPS Core', pre:['MAT130']},
+  {code:'MAT361', name:'Probability and Statistics', credits:3, cat:'SEPS Core', pre:['MAT250']},
+  {code:'MAT125', name:'Linear Algebra', credits:3, cat:'SEPS Core', pre:['MAT116']},
+  {code:'MAT350', name:'Engineering Mathematics', credits:3, cat:'SEPS Core', pre:['MAT250']},
+  {code:'PHY107', name:'Physics I', credits:3, cat:'SEPS Core', pre:['MAT120']},
+  {code:'PHY107L', name:'Physics I Lab', credits:1, cat:'SEPS Core', pre:['MAT120'], pairWith:'PHY107'},
+  {code:'PHY108', name:'Physics II', credits:3, cat:'SEPS Core', pre:['MAT250','PHY107','PHY107L']},
+  {code:'PHY108L', name:'Physics II Lab', credits:1, cat:'SEPS Core', pre:['MAT250','PHY107','PHY107L'], pairWith:'PHY108'},
+  {code:'CHE101', name:'Chemistry I', credits:3, cat:'SEPS Core', pre:[]},
+  {code:'CHE101L', name:'Chemistry I Lab', credits:1, cat:'SEPS Core', pre:[], pairWith:'CHE101'},
+  {code:'EEE452', name:'Engineering Economics', credits:3, cat:'SEPS Core', pre:[]},
+  {code:'CEE110', name:'Engineering Drawing', credits:1, cat:'SEPS Core', pre:[]},
+  {code:'CSE115', name:'Programming Language I', credits:3, cat:'SEPS Core', pre:[]},
+  {code:'CSE115L', name:'Programming Language I Lab', credits:1, cat:'SEPS Core', pre:[], pairWith:'CSE115'},
+
+  // ---- CSE Major Core (42) ----
+  {code:'CSE173', name:'Discrete Mathematics', credits:3, cat:'CSE Major Core', pre:['CSE115','CSE115L']},
+  {code:'CSE215', name:'Programming Language II', credits:3, cat:'CSE Major Core', pre:['CSE115','CSE115L']},
+  {code:'CSE215L', name:'Programming Language II Lab', credits:1, cat:'CSE Major Core', pre:['CSE115','CSE115L'], pairWith:'CSE215'},
+  {code:'CSE225', name:'Data Structures and Algorithms', credits:3, cat:'CSE Major Core', pre:['CSE215','CSE215L']},
+  {code:'CSE225L', name:'Data Structures and Algorithms Lab', credits:0, cat:'CSE Major Core', pre:['CSE215','CSE215L'], pairWith:'CSE225'},
+  {code:'CSE231', name:'Digital Logic Design', credits:3, cat:'CSE Major Core', pre:['CSE173']},
+  {code:'CSE231L', name:'Digital Logic Design Lab', credits:0, cat:'CSE Major Core', pre:['CSE173'], pairWith:'CSE231'},
+  {code:'EEE141', name:'Electrical Circuits I', credits:3, cat:'CSE Major Core', pre:['MAT120']},
+  {code:'EEE141L', name:'Electrical Circuits I Lab', credits:1, cat:'CSE Major Core', pre:['MAT120'], pairWith:'EEE141'},
+  {code:'EEE111', name:'Analog Electronics I', credits:3, cat:'CSE Major Core', pre:['EEE141','EEE141L']},
+  {code:'EEE111L', name:'Analog Electronics I Lab', credits:1, cat:'CSE Major Core', pre:['EEE141','EEE141L'], pairWith:'EEE111'},
+  {code:'CSE311', name:'Database Systems', credits:3, cat:'CSE Major Core', pre:['CSE225','CSE225L']},
+  {code:'CSE311L', name:'Database Systems Lab', credits:0, cat:'CSE Major Core', pre:['CSE225','CSE225L'], pairWith:'CSE311'},
+  {code:'CSE332', name:'Computer Organization and Architecture', credits:3, cat:'CSE Major Core', pre:['CSE231','CSE231L']},
+  {code:'CSE323', name:'Operating Systems Design', credits:3, cat:'CSE Major Core', pre:['CSE332']},
+  {code:'CSE331', name:'Microprocessor Interfacing & Embedded Systems', credits:3, cat:'CSE Major Core', pre:['CSE332']},
+  {code:'CSE331L', name:'Microprocessor Interfacing & Embedded Systems Lab', credits:0, cat:'CSE Major Core', pre:['CSE332'], pairWith:'CSE331'},
+  {code:'CSE327', name:'Software Engineering', credits:3, cat:'CSE Major Core', pre:['CSE311','CSE311L']},
+  {code:'CSE373', name:'Design and Analysis of Algorithms', credits:3, cat:'CSE Major Core', pre:['CSE225','CSE225L','MAT361']},
+  {code:'CSE425', name:'Concepts of Programming Languages', credits:3, cat:'CSE Major Core', pre:['CSE327']},
+
+  // ---- Capstone (4) ----
+  {code:'CSE299', name:'Junior Design Project I', credits:1, cat:'Capstone', pre:[{minCredits:60}]},
+  {code:'CSE499A', name:'Senior Design Project I', credits:1.5, cat:'Capstone', pre:[{minCredits:100}]},
+  {code:'CSE499B', name:'Senior Design Project II', credits:1.5, cat:'Capstone', pre:['CSE499A']},
+
+  // ---- Open Elective (3) ----
+  {code:'OPEN1', name:'Open Elective Course', credits:3, cat:'Open Elective', pre:[]},
+
+  // ---- Major Electives (9 — pick 3, min. 2 from one trail) ----
+  {code:'CSE417', name:'Numerical Methods', credits:3, cat:'Major Elective', trail:'Algorithms & Computation', pre:['CSE225','MAT125']},
+  {code:'CSE401', name:'Advanced Programming Techniques', credits:3, cat:'Major Elective', trail:'Algorithms & Computation', pre:[]},
+  {code:'CSE418', name:'Computer Graphics', credits:3, cat:'Major Elective', trail:'Algorithms & Computation', pre:['CSE225','CSE332']},
+  {code:'CSE426', name:'Compiler Construction', credits:3, cat:'Major Elective', trail:'Algorithms & Computation', pre:['CSE332']},
+  {code:'CSE473', name:'Theory of Computation', credits:3, cat:'Major Elective', trail:'Algorithms & Computation', pre:['CSE173','CSE225']},
+  {code:'CSE411', name:'Advanced Database Systems', credits:3, cat:'Major Elective', trail:'Software Engineering', pre:['CSE311']},
+  {code:'CSE424', name:'Object-Oriented Software Development', credits:3, cat:'Major Elective', trail:'Software Engineering', pre:['CSE225']},
+  {code:'CSE427', name:'Software Quality Assurance & Testing', credits:3, cat:'Major Elective', trail:'Software Engineering', pre:['CSE327']},
+  {code:'CSE428', name:'Software Process Management', credits:3, cat:'Major Elective', trail:'Software Engineering', pre:['CSE327']},
+  {code:'CSE429', name:'Software System Architecture', credits:3, cat:'Major Elective', trail:'Software Engineering', pre:['CSE327']},
+  {code:'CSE422', name:'Modelling and Simulation', credits:3, cat:'Major Elective', trail:'Networks', pre:[]},
+  {code:'CSE438', name:'Data Communication & Network', credits:3, cat:'Major Elective', trail:'Networks', pre:['CSE215']},
+  {code:'CSE482', name:'Internet and Web Technology', credits:3, cat:'Major Elective', trail:'Networks', pre:['CSE438']},
+  {code:'CSE485', name:'Digital Signal Processing', credits:3, cat:'Major Elective', trail:'Networks', pre:[]},
+  {code:'CSE486', name:'Mobile and Wireless Application Development', credits:3, cat:'Major Elective', trail:'Networks', pre:[]},
+  {code:'CSE433', name:'Advanced Computer Architecture', credits:3, cat:'Major Elective', trail:'Architecture & VLSI', pre:['CSE331']},
+  {code:'CSE435', name:'Introduction to VLSI Design', credits:3, cat:'Major Elective', trail:'Architecture & VLSI', pre:['EEE111','CSE231']},
+  {code:'CSE413', name:'Verilog HDL: Modelling, Simulation & Synthesis', credits:3, cat:'Major Elective', trail:'Architecture & VLSI', pre:['CSE231']},
+  {code:'CSE414', name:'Advanced Chip Design Methodology (HDL)', credits:3, cat:'Major Elective', trail:'Architecture & VLSI', pre:['CSE413']},
+  {code:'CSE440', name:'Artificial Intelligence', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:['CSE225','MAT361']},
+  {code:'CSE445', name:'Machine Learning', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:['CSE440']},
+  {code:'CSE465', name:'Pattern Recognition & Neural Networks', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:['CSE373']},
+  {code:'CSE467', name:'Digital Image Processing', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:[]},
+  {code:'CSE419', name:'Data Mining', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:[]},
+  {code:'CSE470', name:'Theory of Fuzzy Systems', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:[]},
+
+  // Special Topics — variable-subject electives offered when faculty expertise is available
+  // (e.g. Quantum Computing, Optical Computing); not fixed to one trail, so left untracked here.
+  {code:'CSE491', name:'Special Topics I', credits:3, cat:'Major Elective', pre:[]},
+  {code:'CSE492', name:'Special Topics II', credits:3, cat:'Major Elective', pre:[]},
+  {code:'CSE493', name:'Special Topics III', credits:3, cat:'Major Elective', pre:[]},
+  {code:'CSE494', name:'Special Topics IV', credits:3, cat:'Major Elective', pre:[]},
+  {code:'CSE495', name:'Special Topics V', credits:3, cat:'Major Elective', pre:[]},
+];
+
+const BSCSE_CATEGORY_TARGETS = {
+  'University Core': 34,
+  'SEPS Core': 38,
+  'CSE Major Core': 42,
+  'Capstone': 4,
+  'Major Elective': 9,
+  'Open Elective': 3,
+};
+
+const GRADES = ['A','A-','B+','B','B-','C+','C','C-','D+','D','F','W','I'];
+const GRADE_POINTS = {A:4.0,'A-':3.7,'B+':3.3,B:3.0,'B-':2.7,'C+':2.3,C:2.0,'C-':1.7,'D+':1.3,D:1.0,F:0.0};
+const NEUTRAL_GRADES = ['W','I'];
+
+/* =========================================================
+   MAJORS REGISTRY
+   Each major = { id, name, builtin, totalCredits, categoryTargets:{cat:credits}, courses:[...] }
+   Built-in majors ship with the app; custom majors are user-defined and persist to localStorage.
+   ========================================================= */
+const BUILTIN_MAJORS = {
+  bscse: {
+    id: 'bscse',
+    name: 'BSCSE — Computer Science & Engineering',
+    builtin: true,
+    totalCredits: 130,
+    categoryTargets: BSCSE_CATEGORY_TARGETS,
+    courses: BSCSE_COURSES,
+  },
+};
+
+const MAJORS_KEY = 'coursemap.majors.v1';
+let customMajors = {};
+
+function loadMajors(){
+  try{
+    const raw = localStorage.getItem(MAJORS_KEY);
+    customMajors = raw ? JSON.parse(raw) : {};
+  }catch(e){ customMajors = {}; }
+}
+function saveMajors(){ localStorage.setItem(MAJORS_KEY, JSON.stringify(customMajors)); }
+
+function allMajors(){ return {...BUILTIN_MAJORS, ...customMajors}; }
+function getMajor(id){ return allMajors()[id]; }
+function activeMajor(){ return getMajor(settings.activeMajorId) || BUILTIN_MAJORS.bscse; }
+function activeCourses(){ return activeMajor().courses; }
+function activeCategoryTargets(){ return activeMajor().categoryTargets; }
+function activeCategoryOrder(){ return Object.keys(activeCategoryTargets()); }
+function activeTotalCredits(){ return activeMajor().totalCredits; }
+
+function courseByCode(code){ return activeCourses().find(c=>c.code===code); }
+
+// generate semester list Summer 2022 -> Summer 2028
+function buildSemesters(){
+  const order = ['Spring','Summer','Fall'];
+  const out = [];
+  let year = 2022, idx = 1; // start at Summer
+  for(let i=0;i<24;i++){
+    out.push(order[idx]+' '+year);
+    idx++; if(idx>2){idx=0; year++;}
+  }
+  return out;
+}
+const SEMESTERS = buildSemesters();
+
+/* =========================================================
+   STATE + PERSISTENCE
+   ========================================================= */
+const STORAGE_KEY = 'coursemap.records.v1';
+const SETTINGS_KEY = 'coursemap.settings.v1';
+let records = [];
+let settings = {targetCredits:15, activeMajorId:'bscse'};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    records = raw ? JSON.parse(raw) : [];
+  }catch(e){ records = []; }
+  try{
+    const raws = localStorage.getItem(SETTINGS_KEY);
+    if(raws) settings = {...settings, ...JSON.parse(raws)};
+  }catch(e){}
+  loadMajors();
+  if(!getMajor(settings.activeMajorId)) settings.activeMajorId = 'bscse';
+}
+function saveRecords(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+/* =========================================================
+   CALCULATIONS
+   ========================================================= */
+function bestAttemptsMap(){
+  // returns Map code -> best record (highest grade point among non W/I; if only W/I, ignore)
+  const map = new Map();
+  records.forEach(r=>{
+    if(NEUTRAL_GRADES.includes(r.grade)) return; // W/I never counted
+    const gp = GRADE_POINTS[r.grade];
+    if(gp===undefined) return;
+    const existing = map.get(r.code);
+    if(!existing || gp > GRADE_POINTS[existing.grade]){
+      map.set(r.code, r);
+    }
+  });
+  return map;
+}
+
+// Rounds to 2 decimals correctly even at exact .xx5 boundaries, where plain
+// toFixed(2) can misround due to binary floating-point representation.
+function roundTo2(n){
+  return Math.round((n + Number.EPSILON) * 100) / 100;
+}
+
+function computeCGPA(){
+  const best = bestAttemptsMap();
+  let qp=0, creditsAttempted=0;
+  best.forEach(r=>{
+    const course = courseByCode(r.code);
+    if(!course) return;
+    creditsAttempted += course.credits;
+    qp += course.credits * GRADE_POINTS[r.grade];
+  });
+  return { cgpa: creditsAttempted ? qp/creditsAttempted : 0, creditsAttempted, qp };
+}
+
+function creditsEarned(){
+  const best = bestAttemptsMap();
+  let earned = 0;
+  const earnedGroups = new Set();
+  best.forEach(r=>{
+    const course = courseByCode(r.code);
+    if(!course) return;
+    if(GRADE_POINTS[r.grade] > 0){
+      if(course.group){
+        if(earnedGroups.has(course.group)) return; // only count one course per group
+        earnedGroups.add(course.group);
+      }
+      earned += course.credits;
+    }
+  });
+  return earned;
+}
+
+function creditsByCategory(){
+  const best = bestAttemptsMap();
+  const out = {}; activeCategoryOrder().forEach(c=>out[c]=0);
+  const earnedGroups = new Set();
+  best.forEach(r=>{
+    const course = courseByCode(r.code);
+    if(!course || GRADE_POINTS[r.grade] <= 0) return;
+    if(course.group){
+      if(earnedGroups.has(course.group)) return;
+      earnedGroups.add(course.group);
+    }
+    out[course.cat] = (out[course.cat]||0) + course.credits;
+  });
+  return out;
+}
+
+function isCompleted(code, best){
+  const r = best.get(code);
+  return !!r && GRADE_POINTS[r.grade] > 0;
+}
+function completedGroupSatisfied(group, best){
+  return activeCourses().some(c=>c.group===group && isCompleted(c.code, best));
+}
+function prereqsMet(course, best, totalEarned){
+  return course.pre.every(p=>{
+    if(typeof p === 'object') return totalEarned >= p.minCredits;
+    const pc = courseByCode(p);
+    if(pc && pc.group) return completedGroupSatisfied(pc.group, best);
+    return isCompleted(p, best);
+  });
+}
+function getStatus(course, best, totalEarned){
+  if(course.group && completedGroupSatisfied(course.group, best) && !isCompleted(course.code, best)) return 'group-filled';
+  if(isCompleted(course.code, best)) return 'done';
+  const rec = best.get(course.code);
+  if(rec && GRADE_POINTS[rec.grade] === 0) return 'retake'; // F, best attempt
+  if(prereqsMet(course, best, totalEarned)) return 'available';
+  return 'locked';
+}
+
+/* =========================================================
+   RENDER: OVERVIEW
+   ========================================================= */
+function renderOverview(){
+  const {cgpa} = computeCGPA();
+  const earned = creditsEarned();
+  const pct = Math.min(100, (earned/activeTotalCredits())*100);
+  const circumference = 314;
+
+  document.getElementById('hdrCgpa').textContent = roundTo2(cgpa).toFixed(2);
+  document.getElementById('hdrCredits').textContent = earned + ' / ' + activeTotalCredits();
+
+  document.getElementById('cgpaRingText').textContent = roundTo2(cgpa).toFixed(2);
+  document.getElementById('cgpaRing').style.strokeDashoffset = circumference - (circumference*(cgpa/4));
+  document.getElementById('creditsEarnedNum').textContent = earned + ' / ' + activeTotalCredits();
+
+  document.getElementById('progRingText').textContent = Math.round(pct) + '%';
+  document.getElementById('progRing').style.strokeDashoffset = circumference - (circumference*(pct/100));
+
+  const remaining = Math.max(0, activeTotalCredits() - earned);
+  const target = settings.targetCredits || 15;
+  const semLeft = remaining>0 ? Math.ceil(remaining/target) : 0;
+  document.getElementById('semEstimate').textContent = remaining===0 ? 'Complete' : (semLeft + (semLeft===1?' semester':' semesters'));
+
+  const best = bestAttemptsMap();
+  let retakeCount = 0, fCount = 0;
+  best.forEach(r=>{ if(GRADE_POINTS[r.grade]===0) fCount++; });
+  const codeCounts = {};
+  records.forEach(r=>{ codeCounts[r.code]=(codeCounts[r.code]||0)+1; });
+  Object.values(codeCounts).forEach(n=>{ if(n>1) retakeCount++; });
+
+  const cards = [
+    {label:'Cumulative GPA', value:roundTo2(cgpa).toFixed(2), sub:'Best attempt per course, per NSU policy'},
+    {label:'Credits Earned', value:earned, sub:(activeTotalCredits()-earned)+' credits remaining', cls:'trace'},
+    {label:'Courses Retaken', value:retakeCount, sub:retakeCount? 'Old grade excluded from CGPA':'None yet'},
+    {label:'Open F Grades', value:fCount, sub:fCount? 'Retake to earn credit + fix CGPA':'None outstanding', cls: fCount? 'warn':''},
+  ];
+  document.getElementById('statCards').innerHTML = cards.map(c=>`
+    <div class="card ${c.cls||''}">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="sub">${c.sub}</div>
+    </div>`).join('');
+
+  const byCat = creditsByCategory();
+  document.getElementById('categoryBars').innerHTML = activeCategoryOrder().map(cat=>{
+    const have = byCat[cat]||0; const target = activeCategoryTargets()[cat];
+    const pctc = Math.min(100, (have/target)*100);
+    return `<div class="cat-row">
+      <div class="top"><span>${cat}</span><b>${have} / ${target} cr</b></div>
+      <div class="bar"><i style="width:${pctc}%"></i></div>
+    </div>`;
+  }).join('');
+}
+
+/* =========================================================
+   RENDER: HISTORY
+   ========================================================= */
+function semesterSort(a,b){
+  return SEMESTERS.indexOf(a) - SEMESTERS.indexOf(b);
+}
+function renderHistory(){
+  const tbody = document.getElementById('historyBody');
+  const sorted = [...records].sort((a,b)=> semesterSort(a.semester,b.semester) || a.code.localeCompare(b.code));
+  const best = bestAttemptsMap();
+
+  if(sorted.length===0){
+    tbody.innerHTML = '';
+    document.getElementById('historyEmpty').style.display='block';
+    return;
+  }
+  document.getElementById('historyEmpty').style.display='none';
+
+  // group by code to know which are "old" retake rows
+  const countByCode = {};
+  records.forEach(r=> countByCode[r.code]=(countByCode[r.code]||0)+1 );
+
+  tbody.innerHTML = sorted.map(r=>{
+    const course = courseByCode(r.code) || {name:'(unknown course)', credits:'—'};
+    const bestRec = best.get(r.code);
+    const isOld = countByCode[r.code]>1 && (!bestRec || bestRec.id !== r.id);
+    let statusPill = '';
+    if(NEUTRAL_GRADES.includes(r.grade)){
+      statusPill = `<span class="pill">${r.grade==='W'?'Withdrawn':'Incomplete'}</span>`;
+    } else if(isOld){
+      statusPill = `<span class="pill lock">Superseded</span>`;
+    } else if(GRADE_POINTS[r.grade]===0){
+      statusPill = `<span class="pill warn">Failed</span>`;
+    } else if(countByCode[r.code]>1){
+      statusPill = `<span class="pill ok">Retaken ✓</span>`;
+    } else {
+      statusPill = `<span class="pill ok">Counted</span>`;
+    }
+    return `<tr class="${isOld?'retake-old':''}">
+      <td>${r.semester}</td>
+      <td class="code">${r.code}</td>
+      <td>${course.name}</td>
+      <td>${course.credits}</td>
+      <td>${r.grade}</td>
+      <td>${statusPill}</td>
+      <td style="white-space:nowrap;">
+        <button class="action" onclick="editRecord('${r.id}')">Edit</button>
+        <button class="action" onclick="deleteRecord('${r.id}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* =========================================================
+   RENDER: CURRICULUM
+   ========================================================= */
+function renderCurriculum(){
+  const best = bestAttemptsMap();
+  const totalEarned = creditsEarned();
+  const container = document.getElementById('curriculumBody');
+  const m = activeMajor();
+  document.getElementById('curriculumTitle').textContent = `Curriculum Map — ${m.name} (${m.totalCredits} Credits)`;
+
+  function renderTile(c){
+    const status = getStatus(c, best, totalEarned);
+    let cls='locked', label='Locked';
+    if(status==='done'){cls='done'; label='Completed';}
+    else if(status==='group-filled'){cls='done'; label='Fulfilled (group)';}
+    else if(status==='retake'){cls='retake'; label='Retake needed';}
+    else if(status==='available'){cls='avail'; label='Available';}
+    return `<div class="course-tile ${cls}">
+      <div class="code">${c.code}</div>
+      <div class="name">${c.name}</div>
+      <div class="meta"><span style="color:var(--ink-faint);">${c.credits} cr</span><span class="pill ${cls==='done'?'ok':cls==='retake'?'warn':cls==='avail'?'avail':'lock'}">${label}</span></div>
+    </div>`;
+  }
+
+  container.innerHTML = activeCategoryOrder().map(cat=>{
+    const courses = activeCourses().filter(c=>c.cat===cat);
+    const byCat = creditsByCategory();
+    const have = byCat[cat]||0;
+
+    const trails = [...new Set(courses.map(c=>c.trail).filter(Boolean))];
+    const untracked = courses.filter(c=>!c.trail);
+
+    let bodyHtml;
+    if(trails.length > 0){
+      bodyHtml = trails.map(t=>{
+        const trailCourses = courses.filter(c=>c.trail===t);
+        return `<div class="trail-segment">
+          <div class="trail-segment-header">${t}</div>
+          <div class="course-grid">${trailCourses.map(renderTile).join('')}</div>
+        </div>`;
+      }).join('') + (untracked.length ? `<div class="trail-segment">
+          <div class="trail-segment-header">Other</div>
+          <div class="course-grid">${untracked.map(renderTile).join('')}</div>
+        </div>` : '');
+    } else {
+      bodyHtml = `<div class="course-grid">${courses.map(renderTile).join('')}</div>`;
+    }
+
+    return `<div class="cat-block">
+      <div class="cat-header"><h3>${cat}</h3><span>${have} / ${activeCategoryTargets()[cat]} credits</span></div>
+      ${bodyHtml}
+    </div>`;
+  }).join('');
+}
+
+/* =========================================================
+   RECOMMENDATION ENGINE
+   ========================================================= */
+function buildRecommendation(){
+  const best = bestAttemptsMap();
+  const totalEarned = creditsEarned();
+  const target = settings.targetCredits || 15;
+
+  // Only PASSED courses count as "done" for prerequisite purposes.
+  // Courses whose best attempt is an F still need a retake before anything downstream unlocks.
+  let simulatedCompleted = new Set(
+    [...best.keys()].filter(code => GRADE_POINTS[best.get(code).grade] > 0)
+  );
+  let pendingRetakes = new Set(
+    [...best.keys()].filter(code => GRADE_POINTS[best.get(code).grade] === 0)
+  );
+  let simulatedCredits = totalEarned;
+  let simulatedElectivesTaken = activeCourses().filter(c=>c.cat==='Major Elective' && simulatedCompleted.has(c.code)).length;
+  let simulatedOpenTaken = simulatedCompleted.has('OPEN1');
+  const plan = [];
+
+  const isPrereqSatisfied = (p) => {
+    if(typeof p==='object') return simulatedCredits >= p.minCredits;
+    const pc = courseByCode(p);
+    if(pc && pc.group) return [...simulatedCompleted].some(code=>{const cc=courseByCode(code); return cc && cc.group===pc.group;});
+    return simulatedCompleted.has(p);
+  };
+
+  for(let sem=0; sem<8 && simulatedCredits < activeTotalCredits(); sem++){
+    // retakes are always "available" (already unlocked before) and get top priority
+    const retakeCourses = activeCourses().filter(c=>pendingRetakes.has(c.code));
+
+    const newAvailable = activeCourses().filter(c=>{
+      if(simulatedCompleted.has(c.code) || pendingRetakes.has(c.code)) return false;
+      if(c.group && [...simulatedCompleted].some(code=>{const cc=courseByCode(code); return cc && cc.group===c.group;})) return false;
+      if(c.cat==='Major Elective' && simulatedElectivesTaken>=3) return false;
+      if(c.cat==='Open Elective' && simulatedOpenTaken) return false;
+      return c.pre.every(isPrereqSatisfied);
+    });
+
+    const availableNow = [...retakeCourses, ...newAvailable];
+    if(availableNow.length===0) break;
+
+    // unlock score: how many other not-yet-completed courses list this course as prereq
+    function unlockScore(code){
+      return activeCourses().filter(c=> c.pre.some(p=> typeof p==='string' && p===code) && !simulatedCompleted.has(c.code)).length;
+    }
+
+    const scored = availableNow.map(c=>({
+      c,
+      score: (pendingRetakes.has(c.code) ? 6 : 0)
+             + (c.cat==='CSE Major Core'?3:c.cat==='SEPS Core'?2.5:c.cat==='University Core'?1.5:c.cat==='Capstone'?4:1)
+             + unlockScore(c.code)*0.7
+             - (parseInt(c.code.replace(/\D/g,''))||0)*0.002
+    })).sort((a,b)=>b.score-a.score);
+
+    // pick courses up to target credits, bundling lab pairs
+    const chosen = [];
+    let creditSum = 0;
+    const chosenCodes = new Set();
+    let electivesPickedThisPass = 0;
+    let openPickedThisPass = false;
+    for(const {c} of scored){
+      if(chosenCodes.has(c.code)) continue;
+      if(creditSum >= target) break;
+      if(c.cat==='Major Elective' && (simulatedElectivesTaken + electivesPickedThisPass) >= 3) continue;
+      if(c.cat==='Open Elective' && (simulatedOpenTaken || openPickedThisPass)) continue;
+      let bundle = [c];
+      const pairLab = availableNow.find(x=>x.pairWith===c.code);
+      if(pairLab && !chosenCodes.has(pairLab.code)) bundle.push(pairLab);
+      const bundleCredits = bundle.reduce((s,x)=>s+x.credits,0);
+      if(creditSum + bundleCredits > target + 2) continue; // avoid big overshoot
+      bundle.forEach(b=>{ chosen.push(b); chosenCodes.add(b.code); });
+      creditSum += bundleCredits;
+      if(c.cat==='Major Elective') electivesPickedThisPass++;
+      if(c.cat==='Open Elective') openPickedThisPass = true;
+    }
+
+    if(chosen.length===0) break;
+
+    plan.push({semester: SEMESTERS[Math.min(SEMESTERS.length-1, plan.length)], courses: chosen, credits: creditSum, retakes: chosen.filter(c=>pendingRetakes.has(c.code)).map(c=>c.code)});
+
+    chosen.forEach(c=>{
+      simulatedCompleted.add(c.code);
+      pendingRetakes.delete(c.code);
+      if(c.cat==='Major Elective') simulatedElectivesTaken++;
+      if(c.cat==='Open Elective') simulatedOpenTaken = true;
+    });
+    simulatedCredits += creditSum;
+  }
+
+  return plan;
+}
+
+function renderRecommendations(){
+  document.getElementById('targetCredits').value = settings.targetCredits;
+
+  const plan = buildRecommendation();
+  const remaining = activeTotalCredits() - creditsEarned();
+  const container = document.getElementById('recBody');
+
+  if(remaining<=0){
+    container.innerHTML = `<div class="empty-note">All 130 credits are accounted for — congratulations, no further courses to recommend. Double-check your degree audit in RDS to confirm.</div>`;
+    return;
+  }
+  if(plan.length===0){
+    container.innerHTML = `<div class="empty-note">No available courses could be planned — this usually means some prerequisites are missing from your Grade History, or the curriculum data needs a manual check. Add more completed courses under Grade History and revisit this tab.</div>`;
+    return;
+  }
+
+  container.innerHTML = plan.map((sem, i)=>{
+    const reasonFor = (c)=>{
+      if(sem.retakes && sem.retakes.includes(c.code)) return 'Retake — previous attempt was an F';
+      if(c.cat==='Capstone') return 'Capstone milestone — schedule deliberately';
+      const unlocks = activeCourses().filter(x=>x.pre.some(p=>p===c.code)).length;
+      if(unlocks>0) return `Unlocks ${unlocks} later course${unlocks>1?'s':''}`;
+      if(c.cat==='Major Elective') return `${c.trail} trail elective`;
+      return 'Required core course';
+    };
+
+    // 0-credit labs are bundled into their theory course and can't be taken alone —
+    // fold them into the parent course's line instead of listing them separately.
+    const zeroCreditLabs = sem.courses.filter(c => c.credits === 0 && c.pairWith);
+    const visibleCourses = sem.courses.filter(c => !(c.credits === 0 && c.pairWith));
+
+    return `<div class="rec-sem">
+      <h4>Suggested Semester ${i+1} <span>${sem.credits} credits</span></h4>
+      <ul class="rec-list">
+        ${visibleCourses.map(c=>{
+          const bundledLab = zeroCreditLabs.find(l=>l.pairWith===c.code);
+          const labNote = bundledLab ? ` <span style="color:var(--ink-faint);">(+ ${bundledLab.code} lab)</span>` : '';
+          return `<li><span><b class="code">${c.code}</b> — ${c.name}${labNote}</span><span class="why">${reasonFor(c)}</span></li>`;
+        }).join('')}
+      </ul>
+    </div>`;
+  }).join('') + `<p style="color:var(--ink-faint); font-size:11.5px; font-family:var(--font-mono); margin-top:10px;">
+    This plan is a heuristic based on prerequisite chains and category needs — it doesn't know real seat availability,
+    trimester course offerings, or your schedule constraints. Use it as a starting point for advising, not a substitute for it.
+  </p>`;
+}
+
+/* =========================================================
+   MODAL / FORM LOGIC
+   ========================================================= */
+const modalOverlay = document.getElementById('modalOverlay');
+function openModal(recordId){
+  document.getElementById('fRecordId').value = recordId || '';
+  document.getElementById('modalTitle').textContent = recordId ? 'Edit Course Record' : 'Add Course Record';
+
+  const fCourse = document.getElementById('fCourse');
+  fCourse.innerHTML = activeCourses().map(c=>`<option value="${c.code}">${c.code} — ${c.name}</option>`).join('');
+
+  const fSemester = document.getElementById('fSemester');
+  fSemester.innerHTML = SEMESTERS.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+  const fGrade = document.getElementById('fGrade');
+  fGrade.innerHTML = GRADES.map(g=>`<option value="${g}">${g}</option>`).join('');
+
+  if(recordId){
+    const r = records.find(x=>x.id===recordId);
+    if(r){ fCourse.value=r.code; fSemester.value=r.semester; fGrade.value=r.grade; }
+  }
+  modalOverlay.classList.add('show');
+}
+function closeModal(){ modalOverlay.classList.remove('show'); }
+
+function editRecord(id){ openModal(id); }
+function deleteRecord(id){
+  if(!confirm('Delete this course record?')) return;
+  records = records.filter(r=>r.id!==id);
+  saveRecords(); renderAll();
+}
+
+document.getElementById('btnAddGrade').addEventListener('click', ()=>openModal(null));
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e)=>{ if(e.target===modalOverlay) closeModal(); });
+
+/* ---- Export / Import ---- */
+function exportData(){
+  const payload = {
+    app: 'coursemap',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    records,
+    settings,
+    customMajors,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `coursemap-backup-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function validateImportedRecord(r){
+  return r && typeof r.code === 'string' && typeof r.semester === 'string'
+    && typeof r.grade === 'string' && GRADES.includes(r.grade);
+}
+
+function importData(file){
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    let parsed;
+    try{
+      parsed = JSON.parse(e.target.result);
+    }catch(err){
+      alert('That file isn\'t valid JSON — make sure you picked a CourseMap backup file.');
+      return;
+    }
+    if(!parsed || !Array.isArray(parsed.records)){
+      alert('This file doesn\'t look like a CourseMap backup (missing a "records" list).');
+      return;
+    }
+    const validRecords = [];
+    const unknownCourses = new Set();
+    let skipped = 0;
+    parsed.records.forEach(r=>{
+      if(!validateImportedRecord(r)){ skipped++; return; }
+      if(!courseByCode(r.code)) unknownCourses.add(r.code);
+      validRecords.push({
+        id: r.id || ('r'+Date.now()+Math.random().toString(36).slice(2,7)),
+        code: r.code, semester: r.semester, grade: r.grade
+      });
+    });
+
+    const currentCount = records.length;
+    let msg = `Import ${validRecords.length} course record${validRecords.length===1?'':'s'}`;
+    if(currentCount>0) msg += ` and REPLACE your current ${currentCount} record${currentCount===1?'':'s'}`;
+    msg += '?';
+    if(skipped>0) msg += `\n(${skipped} row(s) in the file were skipped — invalid or unrecognized grade.)`;
+    if(unknownCourses.size>0) msg += `\nNote: ${unknownCourses.size} course code(s) aren't in this app's curriculum list and will be kept but won't show on the Curriculum Map: ${[...unknownCourses].join(', ')}`;
+
+    if(!confirm(msg)) return;
+
+    records = validRecords;
+    if(parsed.settings && typeof parsed.settings.targetCredits === 'number'){
+      settings.targetCredits = parsed.settings.targetCredits;
+    }
+    if(parsed.customMajors && typeof parsed.customMajors === 'object'){
+      customMajors = parsed.customMajors;
+      saveMajors();
+    }
+    if(parsed.settings && parsed.settings.activeMajorId && getMajor(parsed.settings.activeMajorId)){
+      settings.activeMajorId = parsed.settings.activeMajorId;
+    }
+    saveSettings();
+    saveRecords();
+    renderAll();
+    alert('Import complete.');
+  };
+  reader.onerror = () => alert('Could not read that file.');
+  reader.readAsText(file);
+}
+
+document.getElementById('btnExport').addEventListener('click', exportData);
+document.getElementById('btnImport').addEventListener('click', ()=>document.getElementById('fileImport').click());
+document.getElementById('fileImport').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(file) importData(file);
+  e.target.value = ''; // allow re-selecting the same file later
+});
+
+document.getElementById('btnSave').addEventListener('click', ()=>{
+  const id = document.getElementById('fRecordId').value;
+  const code = document.getElementById('fCourse').value;
+  const semester = document.getElementById('fSemester').value;
+  const grade = document.getElementById('fGrade').value;
+
+  if(id){
+    const r = records.find(x=>x.id===id);
+    if(r){ r.code=code; r.semester=semester; r.grade=grade; }
+  } else {
+    records.push({id:'r'+Date.now()+Math.random().toString(36).slice(2,7), code, semester, grade});
+  }
+  saveRecords();
+  closeModal();
+  renderAll();
+});
+
+/* =========================================================
+   MAJORS MODULE
+   ========================================================= */
+function slugify(name){
+  return 'custom_' + name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40) + '_' + Date.now().toString(36).slice(-4);
+}
+
+function renderMajorSelector(){
+  const sel = document.getElementById('majorSelect');
+  const majors = allMajors();
+  sel.innerHTML = Object.values(majors).map(m=>
+    `<option value="${m.id}">${m.name}${m.builtin?' (built-in)':''}</option>`
+  ).join('');
+  sel.value = settings.activeMajorId;
+}
+
+function renderMajorTab(){
+  const m = activeMajor();
+  document.getElementById('activeMajorName').textContent = m.name;
+  document.getElementById('activeMajorSub').textContent =
+    `${m.totalCredits} total credits · ${activeCourses().length} courses in catalog${m.builtin?' · built-in (read-only)':' · custom (editable)'}`;
+
+  document.getElementById('btnDeleteMajor').style.display = m.builtin ? 'none' : 'inline-block';
+
+  const editor = document.getElementById('majorEditor');
+
+  if(m.builtin){
+    editor.innerHTML = `<div class="empty-note">
+      Built-in majors ship with the app and can't be edited directly. Click "Duplicate Active Major as Custom" above
+      to get an editable copy you can adjust — rename courses, tweak prerequisites, or add your own.
+    </div>`;
+    return;
+  }
+
+  const targets = m.categoryTargets;
+  const catRows = Object.keys(targets).map(cat=>`
+    <div class="cat-row">
+      <div class="top"><span>${cat}</span>
+        <span style="display:flex; align-items:center; gap:6px;">
+          <input type="number" min="0" step="1" value="${targets[cat]}" style="width:70px; background:var(--panel-2); border:1px solid var(--line); color:var(--ink); border-radius:4px; padding:3px 6px; font-family:var(--font-mono); font-size:12px;"
+                 onchange="updateCategoryTarget('${m.id}','${cat.replace(/'/g,"\\'")}', this.value)">
+          <button class="action" onclick="deleteCategoryFromMajor('${m.id}','${cat.replace(/'/g,"\\'")}')">Remove</button>
+        </span>
+      </div>
+    </div>`).join('');
+
+  const courseRows = m.courses.map(c=>`
+    <tr>
+      <td class="code">${c.code}</td>
+      <td>${c.name}</td>
+      <td>${c.credits}</td>
+      <td>${c.cat}${c.trail?` <span style="color:var(--ink-faint); font-size:11px;">(${c.trail})</span>`:''}</td>
+      <td style="font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint);">${c.pre.filter(p=>typeof p==='string').join(', ')||'—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="action" onclick="editCourseInMajor('${m.id}','${c.code}')">Edit</button>
+        <button class="action" onclick="deleteCourseFromMajor('${m.id}','${c.code}')">Delete</button>
+      </td>
+    </tr>`).join('');
+
+  editor.innerHTML = `
+    <h3 style="font-family:var(--font-display); font-size:15px; margin:24px 0 10px;">Categories &amp; Targets</h3>
+    ${catRows || '<div class="empty-note">No categories yet — add a course below with a new category name to create one.</div>'}
+
+    <div class="toolbar" style="margin-top:22px;">
+      <h3 style="font-family:var(--font-display); font-size:15px; margin:0;">Courses (${m.courses.length})</h3>
+      <button class="primary" id="btnAddCourseToMajor">+ Add Course</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>Code</th><th>Name</th><th>Credits</th><th>Category</th><th>Prerequisites</th><th></th></tr></thead>
+        <tbody>${courseRows || ''}</tbody>
+      </table>
+    </div>
+    ${m.courses.length===0 ? '<div class="empty-note">No courses yet. Add your first required course above.</div>' : ''}
+  `;
+
+  document.getElementById('btnAddCourseToMajor').addEventListener('click', ()=>openCourseModal(m.id, null));
+}
+
+function createCustomMajor(name, totalCredits){
+  const id = slugify(name || 'custom major');
+  customMajors[id] = {
+    id, name: name || 'Untitled Major', builtin:false,
+    totalCredits: totalCredits || 130,
+    categoryTargets: {},
+    courses: []
+  };
+  saveMajors();
+  settings.activeMajorId = id;
+  saveSettings();
+  renderAll();
+}
+
+function duplicateMajorAsCustom(sourceId){
+  const src = getMajor(sourceId);
+  if(!src) return;
+  const id = slugify(src.name + ' copy');
+  customMajors[id] = {
+    id, name: src.name + ' (Custom Copy)', builtin:false,
+    totalCredits: src.totalCredits,
+    categoryTargets: {...src.categoryTargets},
+    courses: JSON.parse(JSON.stringify(src.courses))
+  };
+  saveMajors();
+  settings.activeMajorId = id;
+  saveSettings();
+  renderAll();
+}
+
+function deleteActiveMajor(){
+  const m = activeMajor();
+  if(m.builtin) return;
+  if(!confirm(`Delete the custom major "${m.name}"? This can't be undone (your Grade History records are untouched).`)) return;
+  delete customMajors[m.id];
+  saveMajors();
+  settings.activeMajorId = 'bscse';
+  saveSettings();
+  renderAll();
+}
+
+function updateCategoryTarget(majorId, cat, value){
+  const m = customMajors[majorId];
+  if(!m) return;
+  const v = Math.max(0, parseInt(value)||0);
+  m.categoryTargets[cat] = v;
+  saveMajors();
+  renderAll();
+}
+
+function deleteCategoryFromMajor(majorId, cat){
+  const m = customMajors[majorId];
+  if(!m) return;
+  const coursesInCat = m.courses.filter(c=>c.cat===cat).length;
+  if(coursesInCat>0 && !confirm(`${coursesInCat} course(s) use this category. Remove the category anyway? (courses will keep the category label but it will show 0 target)`)) return;
+  delete m.categoryTargets[cat];
+  saveMajors();
+  renderAll();
+}
+
+function deleteCourseFromMajor(majorId, code){
+  const m = customMajors[majorId];
+  if(!m) return;
+  if(!confirm(`Delete course ${code} from this major?`)) return;
+  m.courses = m.courses.filter(c=>c.code!==code);
+  saveMajors();
+  renderAll();
+}
+
+function editCourseInMajor(majorId, code){
+  openCourseModal(majorId, code);
+}
+
+/* ---- Major modal wiring ---- */
+const majorOverlay = document.getElementById('majorOverlay');
+document.getElementById('btnNewMajor').addEventListener('click', ()=>{
+  document.getElementById('mNewName').value = '';
+  document.getElementById('mNewTotalCredits').value = 130;
+  majorOverlay.classList.add('show');
+});
+document.getElementById('btnMajorCancel').addEventListener('click', ()=>majorOverlay.classList.remove('show'));
+majorOverlay.addEventListener('click', (e)=>{ if(e.target===majorOverlay) majorOverlay.classList.remove('show'); });
+document.getElementById('btnMajorCreate').addEventListener('click', ()=>{
+  const name = document.getElementById('mNewName').value.trim();
+  const total = parseInt(document.getElementById('mNewTotalCredits').value)||130;
+  if(!name){ alert('Please give your major a name.'); return; }
+  createCustomMajor(name, total);
+  majorOverlay.classList.remove('show');
+});
+document.getElementById('btnDuplicateMajor').addEventListener('click', ()=>duplicateMajorAsCustom(settings.activeMajorId));
+document.getElementById('btnDeleteMajor').addEventListener('click', deleteActiveMajor);
+
+document.getElementById('majorSelect').addEventListener('change', (e)=>{
+  settings.activeMajorId = e.target.value;
+  saveSettings();
+  renderAll();
+});
+
+/* ---- Course-in-major modal wiring ---- */
+const courseOverlay = document.getElementById('courseOverlay');
+function openCourseModal(majorId, code){
+  const m = customMajors[majorId];
+  if(!m) return;
+  document.getElementById('courseModalTitle').textContent = code ? 'Edit Course' : 'Add Course';
+  document.getElementById('ccOriginalCode').value = code || '';
+  document.getElementById('ccCategoryList').innerHTML = Object.keys(m.categoryTargets).map(c=>`<option value="${c}"></option>`).join('');
+
+  if(code){
+    const c = m.courses.find(x=>x.code===code);
+    document.getElementById('ccCode').value = c.code;
+    document.getElementById('ccName').value = c.name;
+    document.getElementById('ccCredits').value = c.credits;
+    document.getElementById('ccCategory').value = c.cat;
+    document.getElementById('ccCategoryTarget').value = '';
+    document.getElementById('ccPrereqs').value = c.pre.filter(p=>typeof p==='string').join(', ');
+    document.getElementById('ccTrail').value = c.trail || '';
+  } else {
+    document.getElementById('ccCode').value = '';
+    document.getElementById('ccName').value = '';
+    document.getElementById('ccCredits').value = 3;
+    document.getElementById('ccCategory').value = '';
+    document.getElementById('ccCategoryTarget').value = '';
+    document.getElementById('ccPrereqs').value = '';
+    document.getElementById('ccTrail').value = '';
+  }
+  courseOverlay.dataset.majorId = majorId;
+  courseOverlay.classList.add('show');
+}
+document.getElementById('btnCourseCancel').addEventListener('click', ()=>courseOverlay.classList.remove('show'));
+courseOverlay.addEventListener('click', (e)=>{ if(e.target===courseOverlay) courseOverlay.classList.remove('show'); });
+
+document.getElementById('btnCourseSave').addEventListener('click', ()=>{
+  const majorId = courseOverlay.dataset.majorId;
+  const m = customMajors[majorId];
+  if(!m) return;
+
+  const originalCode = document.getElementById('ccOriginalCode').value;
+  const code = document.getElementById('ccCode').value.trim().toUpperCase();
+  const name = document.getElementById('ccName').value.trim();
+  const credits = parseFloat(document.getElementById('ccCredits').value) || 0;
+  const cat = document.getElementById('ccCategory').value.trim();
+  const catTargetRaw = document.getElementById('ccCategoryTarget').value;
+  const preRaw = document.getElementById('ccPrereqs').value.trim();
+  const trail = document.getElementById('ccTrail').value.trim();
+
+  if(!code || !name || !cat){
+    alert('Course code, name, and category are all required.');
+    return;
+  }
+  if(!originalCode && m.courses.some(c=>c.code===code)){
+    alert(`A course with code ${code} already exists in this major.`);
+    return;
+  }
+
+  const pre = preRaw ? preRaw.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean) : [];
+  const courseObj = {code, name, credits, cat, pre};
+  if(trail) courseObj.trail = trail;
+
+  if(originalCode){
+    const idx = m.courses.findIndex(c=>c.code===originalCode);
+    if(idx>-1) m.courses[idx] = courseObj;
+  } else {
+    m.courses.push(courseObj);
+  }
+
+  if(!(cat in m.categoryTargets)){
+    m.categoryTargets[cat] = catTargetRaw ? (parseInt(catTargetRaw)||credits) : credits;
+  } else if(catTargetRaw){
+    m.categoryTargets[cat] = parseInt(catTargetRaw)||m.categoryTargets[cat];
+  }
+
+  saveMajors();
+  courseOverlay.classList.remove('show');
+  renderAll();
+});
+
+/* =========================================================
+   NAV
+   ========================================================= */
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('section.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+document.getElementById('targetCredits').addEventListener('change', (e)=>{
+  let v = parseInt(e.target.value)||15;
+  v = Math.max(3, Math.min(19, v));
+  settings.targetCredits = v;
+  saveSettings();
+  renderRecommendations();
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function renderAll(){
+  renderMajorSelector();
+  renderOverview();
+  renderHistory();
+  renderCurriculum();
+  renderMajorTab();
+  renderRecommendations();
+}
+loadState();
+renderAll();
+</script>
+</body>
+</html>
