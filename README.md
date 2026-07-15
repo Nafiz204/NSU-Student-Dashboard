@@ -1,4 +1,4 @@
-# CourseMap
+# NSU Student Dashboard
 
 A self-contained academic dashboard for tracking grades, CGPA, degree progress, and course planning — built around North South University's BSCSE curriculum, but flexible enough to support any major.
 

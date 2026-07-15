@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CourseMap — BSCSE Academic Tracker</title>
+<title>NSU Student Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -51,7 +51,7 @@
   .brand-mark{
     width:36px; height:36px; border:1.5px solid var(--amber); border-radius:4px;
     display:flex; align-items:center; justify-content:center;
-    font-family:var(--font-mono); font-size:13px; color:var(--amber); font-weight:600;
+    font-family:var(--font-mono); font-size:11px; color:var(--amber); font-weight:600;
     position:relative;
   }
   .brand-mark::before, .brand-mark::after{
@@ -232,9 +232,9 @@
 
 <header>
   <div class="brand">
-    <div class="brand-mark">CM</div>
+    <div class="brand-mark">NSU</div>
     <div>
-      <h1>CourseMap</h1>
+      <h1>NSU Student Dashboard</h1>
       <p>NSU · School of Engineering &amp; Physical Sciences · BSCSE</p>
     </div>
   </div>
@@ -1120,11 +1120,11 @@ function importData(file){
     try{
       parsed = JSON.parse(e.target.result);
     }catch(err){
-      alert('That file isn\'t valid JSON — make sure you picked a CourseMap backup file.');
+      alert('That file isn\'t valid JSON — make sure you picked a NSU Student Dashboard backup file.');
       return;
     }
     if(!parsed || !Array.isArray(parsed.records)){
-      alert('This file doesn\'t look like a CourseMap backup (missing a "records" list).');
+      alert('This file doesn\'t look like a NSU Student Dashboard backup (missing a "records" list).');
       return;
     }
     const validRecords = [];
