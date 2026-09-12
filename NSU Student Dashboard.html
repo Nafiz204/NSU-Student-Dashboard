@@ -145,6 +145,10 @@
   }
   td{padding:10px 12px; border-bottom:1px solid var(--grid); vertical-align:middle;}
   tr.retake-old td{opacity:.45; text-decoration:line-through; font-style:italic;}
+  tr.sem-summary-tr td{background:var(--panel-2); border-top:1px solid var(--line); border-bottom:2px solid var(--line); padding:8px 12px;}
+  .sem-summary-content{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-family:var(--font-mono); font-size:12px;}
+  .sem-summary-content span{color:var(--ink-dim);}
+  .sem-summary-content b{color:var(--amber); font-family:var(--font-display); font-size:13.5px; font-weight:600; margin-left:4px;}
   .code{font-family:var(--font-mono); color:var(--ink);}
   .pill{
     display:inline-block; font-family:var(--font-mono); font-size:11px; padding:2px 8px; border-radius:999px;
@@ -208,12 +212,83 @@
 
   .empty-note{color:var(--ink-faint); font-size:13px; font-family:var(--font-mono); padding:20px 0;}
 
-  .rec-sem{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px; margin-bottom:14px;}
-  .rec-sem h4{font-family:var(--font-display); margin:0 0 4px; font-size:15px; display:flex; justify-content:space-between;}
-  .rec-sem h4 span{color:var(--ink-faint); font-family:var(--font-mono); font-size:11.5px; font-weight:400;}
+  .rec-summary-bar{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:16px;
+  }
+  .rec-summary-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:12px 14px;
+  }
+  .rec-summary-card .lbl{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;}
+  .rec-summary-card .val{font-family:var(--font-display); font-size:20px; color:var(--ink); margin-top:2px;}
+  .rec-summary-card .sub{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); margin-top:1px;}
+
+  .rec-sem{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px; margin-bottom:14px; transition:border-color .15s ease;}
+  .rec-sem:hover{border-color:var(--line-strong, #3b4252);}
+  .rec-sem h4{font-family:var(--font-display); margin:0 0 8px; font-size:15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;}
+  .rec-sem h4 .rec-sem-meta{display:inline-flex; align-items:center; gap:8px;}
+  .rec-sem h4 span.cr-badge{color:var(--ink); font-family:var(--font-mono); font-size:12px; font-weight:600; background:var(--panel-2); padding:2px 8px; border-radius:4px; border:1px solid var(--line);}
+  .rec-sem h4 span.workload-pill{font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.04em; padding:2px 6px; border-radius:3px;}
+  .workload-pill.balanced{background:rgba(52,211,153,.15); color:var(--emerald, #34d399); border:1px solid rgba(52,211,153,.3);}
+  .workload-pill.heavy{background:rgba(251,191,36,.15); color:var(--amber); border:1px solid rgba(251,191,36,.3);}
+  .workload-pill.intense{background:rgba(248,113,113,.15); color:var(--rust, #f87171); border:1px solid rgba(248,113,113,.3);}
+
   .rec-list{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:6px;}
-  .rec-list li{display:flex; justify-content:space-between; font-size:13px; padding:8px 10px; background:var(--panel-2); border-radius:4px; border-left:2px solid var(--amber);}
-  .rec-list li .why{color:var(--ink-faint); font-size:11px; font-family:var(--font-mono);}
+  .rec-list li{
+    display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:9px 12px;
+    background:var(--panel-2); border-radius:4px; border-left:3px solid var(--amber); gap:12px;
+  }
+  .rec-list li.retake-item{border-left-color:var(--rust, #f87171); background:rgba(248,113,113,.04);}
+  .rec-list li.capstone-item{border-left-color:var(--teal, #0d9488); background:rgba(13,148,136,.04);}
+  .rec-list li.elective-item{border-left-color:var(--blue, #60a5fa);}
+  .rec-list li .rec-item-main{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .retake-advisor-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px 20px; margin-top:24px; margin-bottom:18px;
+  }
+  .retake-advisor-card .title-row{
+    display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:14px;
+  }
+  .retake-controls{
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  }
+  .retake-controls .control-item{
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .retake-controls label{
+    font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.04em;
+  }
+  .retake-controls input, .retake-controls select{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink); padding:6px 10px; border-radius:4px; font-family:var(--font-mono); font-size:12.5px;
+  }
+  .retake-controls input:focus, .retake-controls select:focus{
+    outline:none; border-color:var(--amber);
+  }
+  .retake-table{
+    width:100%; border-collapse:collapse; font-size:12.5px; margin-top:12px;
+  }
+  .retake-table th{
+    text-align:left; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); text-transform:uppercase;
+    letter-spacing:.05em; padding:8px 10px; border-bottom:1px solid var(--line); background:var(--panel-2);
+  }
+  .retake-table td{
+    padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:middle;
+  }
+  .retake-table tr:hover td{
+    background:rgba(255,255,255,.015);
+  }
+  .diff-badge{
+    font-family:var(--font-mono); font-size:11px; font-weight:600; padding:2px 6px; border-radius:3px;
+  }
+  .diff-badge.gain-high{
+    background:rgba(52,211,153,.15); color:var(--emerald,#34d399); border:1px solid rgba(52,211,153,.3);
+  }
+  .diff-badge.gain-med{
+    background:rgba(96,165,250,.15); color:var(--blue,#60a5fa); border:1px solid rgba(96,165,250,.3);
+  }
+  .retake-metric-pill{
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11.5px;
+    padding:4px 10px; border-radius:4px; background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim);
+  }
+  .retake-metric-pill b{color:var(--ink);}
 
   footer{text-align:center; padding:26px; color:var(--ink-faint); font-family:var(--font-mono); font-size:11px; border-top:1px solid var(--line); margin-top:20px;}
 
@@ -299,6 +374,12 @@
 
     <div class="grid-cards" id="statCards"></div>
 
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h2 class="section-title" style="margin:0; flex:1;">Financial Overview</h2>
+      <button class="io-btn" id="btnOpenFeeConfig" title="Configure per-credit rate &amp; base fees breakdown">⚙ Configure Rates</button>
+    </div>
+    <div class="grid-cards" id="feeCards" style="margin-bottom:32px;"></div>
+
     <h2 class="section-title">Credit Progress by Category</h2>
     <div id="categoryBars"></div>
   </section>
@@ -359,14 +440,34 @@
 
   <!-- RECOMMENDATIONS -->
   <section class="view" id="view-recommend">
-    <div class="flex-between" style="margin-bottom:8px;">
-      <h2 class="section-title" style="margin:0;">Course Recommendations</h2>
-      <div class="field" style="margin:0; width:170px;">
-        <label>Target credits / semester</label>
-        <input type="number" id="targetCredits" min="3" max="19" step="1" value="15">
+    <div class="flex-between" style="margin-bottom:14px;">
+      <div>
+        <h2 class="section-title" style="margin:0;">Course Recommendations</h2>
+        <p style="color:var(--ink-faint); font-size:12.5px; margin:4px 0 0; font-family:var(--font-mono);">
+          Prerequisite-aware graduation path planner with category and elective trail optimization
+        </p>
+      </div>
+      <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+        <div class="field" style="margin:0; width:220px;">
+          <label>Focus Elective Trail</label>
+          <select id="recElectiveTrail">
+            <option value="all">Any / General Trail</option>
+            <option value="Artificial Intelligence">Artificial Intelligence</option>
+            <option value="Software Engineering">Software Engineering</option>
+            <option value="Networks">Networks</option>
+            <option value="Algorithms & Computation">Algorithms &amp; Computation</option>
+            <option value="Architecture & VLSI">Architecture &amp; VLSI</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0; width:150px;">
+          <label>Target cr / sem</label>
+          <input type="number" id="targetCredits" min="3" max="19" step="1" value="15">
+        </div>
       </div>
     </div>
+    <div id="recSummary"></div>
     <div id="recBody"></div>
+    <div id="retakeAdvisorContainer"></div>
   </section>
 
 </main>
@@ -457,6 +558,69 @@
   </div>
 </div>
 
+<!-- FINANCIAL CONFIG MODAL -->
+<div class="overlay" id="feeConfigOverlay">
+  <div class="modal" style="max-width:480px;">
+    <h3>Configure Semester Fees &amp; Rates</h3>
+    <div class="field">
+      <label>Per Credit Fee (BDT)</label>
+      <input type="number" id="fcPerCredit" min="0" step="100" value="6500">
+    </div>
+    <div style="font-family:var(--font-mono); font-size:11.5px; color:var(--amber); margin:14px 0 6px; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">Base Semester Fee Breakdown (BDT)</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div class="field">
+        <label>Student Activity</label>
+        <input type="number" id="fcActivity" min="0" step="100" value="3000">
+      </div>
+      <div class="field">
+        <label>Computer Lab</label>
+        <input type="number" id="fcCompLab" min="0" step="100" value="2500">
+      </div>
+      <div class="field">
+        <label>Library Fee</label>
+        <input type="number" id="fcLibrary" min="0" step="100" value="1500">
+      </div>
+      <div class="field">
+        <label>Science Lab</label>
+        <input type="number" id="fcSciLab" min="0" step="100" value="2500">
+      </div>
+      <div class="field" style="grid-column: span 2;">
+        <label>Studio Lab</label>
+        <input type="number" id="fcStudioLab" min="0" step="100" value="0">
+      </div>
+    </div>
+    <div style="padding:10px 14px; background:var(--panel-2); border:1px solid var(--line); border-radius:4px; font-family:var(--font-mono); font-size:12.5px; margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+      <span>Total Base Fee per Semester:</span>
+      <b id="fcTotalBaseText" style="color:var(--amber); font-size:14px;">৳9,500</b>
+    </div>
+    <div class="modal-actions" style="margin-top:20px;">
+      <button class="ghost-btn" id="btnFeeConfigCancel">Cancel</button>
+      <button class="primary" id="btnFeeConfigSave">Save Rates</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEMESTER FEE OVERRIDE MODAL -->
+<div class="overlay" id="feeOverrideOverlay">
+  <div class="modal">
+    <h3 id="feeOverrideTitle">Edit Semester Fee</h3>
+    <p id="feeOverrideSub" style="color:var(--ink-dim); font-size:12px; margin-top:-8px;"></p>
+    <div class="field">
+      <label>Custom Semester Fee Amount (BDT)</label>
+      <input type="number" id="foAmount" min="0" step="500" placeholder="e.g. 60000">
+    </div>
+    <p style="color:var(--ink-faint); font-size:11.5px; font-family:var(--font-mono); margin-top:-4px;">
+      Leave blank to reset to the auto-calculated amount based on credits and standard rates.
+    </p>
+    <input type="hidden" id="foSemester">
+    <div class="modal-actions">
+      <button class="ghost-btn" id="btnFeeOverrideReset" style="border-color:var(--rust); color:var(--rust); margin-right:auto;">Reset to Auto</button>
+      <button class="ghost-btn" id="btnFeeOverrideCancel">Cancel</button>
+      <button class="primary" id="btnFeeOverrideSave">Save Fee</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =========================================================
    COURSE DATABASE — NSU BSCSE, 130-credit curriculum
@@ -482,7 +646,7 @@ const BSCSE_COURSES = [
   {code:'BIO103L', name:'Biology I Lab', credits:1, cat:'University Core', pre:[], pairWith:'BIO103'},
 
   // ---- SEPS Core (38) ----
-  {code:'MAT116', name:'Pre-Calculus', credits:0, cat:'SEPS Core', pre:[]},
+  {code:'MAT116', name:'Pre-Calculus', credits:3, cat:'SEPS Core', pre:[]},  // remedial: 3 cr passed by NSU but not toward CGPA — enter as grade TC
   {code:'MAT120', name:'Calculus I', credits:3, cat:'SEPS Core', pre:['MAT116']},
   {code:'MAT130', name:'Calculus II', credits:3, cat:'SEPS Core', pre:['MAT120']},
   {code:'MAT250', name:'Calculus III', credits:3, cat:'SEPS Core', pre:['MAT130']},
@@ -551,7 +715,7 @@ const BSCSE_COURSES = [
   {code:'CSE413', name:'Verilog HDL: Modelling, Simulation & Synthesis', credits:3, cat:'Major Elective', trail:'Architecture & VLSI', pre:['CSE231']},
   {code:'CSE414', name:'Advanced Chip Design Methodology (HDL)', credits:3, cat:'Major Elective', trail:'Architecture & VLSI', pre:['CSE413']},
   {code:'CSE440', name:'Artificial Intelligence', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:['CSE225','MAT361']},
-  {code:'CSE445', name:'Machine Learning', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:['CSE440']},
+  {code:'CSE445', name:'Machine Learning', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:[]},
   {code:'CSE465', name:'Pattern Recognition & Neural Networks', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:['CSE373']},
   {code:'CSE467', name:'Digital Image Processing', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:[]},
   {code:'CSE419', name:'Data Mining', credits:3, cat:'Major Elective', trail:'Artificial Intelligence', pre:[]},
@@ -578,6 +742,15 @@ const BSCSE_CATEGORY_TARGETS = {
 const GRADES = ['A','A-','B+','B','B-','C+','C','C-','D+','D','F','W','I'];
 const GRADE_POINTS = {A:4.0,'A-':3.7,'B+':3.3,B:3.0,'B-':2.7,'C+':2.3,C:2.0,'C-':1.7,'D+':1.3,D:1.0,F:0.0};
 const NEUTRAL_GRADES = ['W','I'];
+
+// ── NSU-specific hardcoded exceptions ──────────────────────────────────────
+// WAIVER_COURSES: NSU awards degree credits with no grade, no fee, no GPA impact
+//   (e.g. ENG102 — prerequisite waived before enrolment)
+const WAIVER_COURSES = new Set(['ENG102']);
+// NON_QUALIFYING_COURSES: taken & paid normally, credits count toward degree,
+//   but NSU does NOT include them in CGPA (Cr.Count = 0 on transcript)
+//   (e.g. MAT116 Pre-Calculus — remedial; grade kept, fees kept, excluded from GPA)
+const NON_QUALIFYING_COURSES = new Set(['MAT116']);
 
 /* =========================================================
    MAJORS REGISTRY
@@ -634,8 +807,17 @@ const SEMESTERS = buildSemesters();
    ========================================================= */
 const STORAGE_KEY = 'coursemap.records.v1';
 const SETTINGS_KEY = 'coursemap.settings.v1';
-let records = [];
-let settings = {targetCredits:15, activeMajorId:'bscse'};
+const DEFAULT_BASE_FEES = { activity: 3000, computerLab: 2500, library: 1500, scienceLab: 2500, studioLab: 0 };
+let settings = {
+  targetCredits: 15,
+  preferredElectiveTrail: 'all',
+  targetCgpa: 3.0,
+  retakeExpectedGrade: 'B+',
+  activeMajorId: 'bscse',
+  perCreditFee: 6500,
+  baseFeeBreakdown: { ...DEFAULT_BASE_FEES },
+  semesterFeeOverrides: {}
+};
 
 function loadState(){
   try{
@@ -646,6 +828,13 @@ function loadState(){
     const raws = localStorage.getItem(SETTINGS_KEY);
     if(raws) settings = {...settings, ...JSON.parse(raws)};
   }catch(e){}
+  if(settings.targetCredits === undefined) settings.targetCredits = 15;
+  if(settings.preferredElectiveTrail === undefined) settings.preferredElectiveTrail = 'all';
+  if(settings.targetCgpa === undefined) settings.targetCgpa = 3.0;
+  if(settings.retakeExpectedGrade === undefined) settings.retakeExpectedGrade = 'B+';
+  if(settings.perCreditFee === undefined) settings.perCreditFee = 6500;
+  if(!settings.baseFeeBreakdown) settings.baseFeeBreakdown = { ...DEFAULT_BASE_FEES };
+  if(!settings.semesterFeeOverrides) settings.semesterFeeOverrides = {};
   loadMajors();
   if(!getMajor(settings.activeMajorId)) settings.activeMajorId = 'bscse';
 }
@@ -655,11 +844,36 @@ function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(setti
 /* =========================================================
    CALCULATIONS
    ========================================================= */
+function formatCurrency(n){
+  return '৳' + Math.round(n).toLocaleString('en-US');
+}
+
+function getBaseFeeTotal(){
+  const b = settings.baseFeeBreakdown || DEFAULT_BASE_FEES;
+  return (b.activity||0) + (b.computerLab||0) + (b.library||0) + (b.scienceLab||0) + (b.studioLab||0);
+}
+
+function getBilledCredits(course){
+  if(!course) return 0;
+  // 0-credit courses (such as 0-credit lab courses or pre-calculus) bill as 1 credit hour fee (৳6,500)
+  return (typeof course.credits === 'number' && course.credits === 0) ? 1 : (course.credits || 0);
+}
+
+function computeSemesterFee(semBilledCredits, semName){
+  if(settings.semesterFeeOverrides && settings.semesterFeeOverrides[semName] !== undefined && settings.semesterFeeOverrides[semName] !== null){
+    return Number(settings.semesterFeeOverrides[semName]);
+  }
+  const perCredit = settings.perCreditFee !== undefined ? settings.perCreditFee : 6500;
+  return (semBilledCredits * perCredit) + getBaseFeeTotal();
+}
 function bestAttemptsMap(){
-  // returns Map code -> best record (highest grade point among non W/I; if only W/I, ignore)
+  // Returns Map code -> best graded record.
+  // Excludes W/I (neutral) and NON_QUALIFYING_COURSES (taken but not in CGPA per NSU).
+  // WAIVER_COURSES never have records so they're naturally absent.
   const map = new Map();
   records.forEach(r=>{
-    if(NEUTRAL_GRADES.includes(r.grade)) return; // W/I never counted
+    if(NEUTRAL_GRADES.includes(r.grade)) return;
+    if(NON_QUALIFYING_COURSES.has(r.code)) return; // excluded from GPA; handled in creditsEarned separately
     const gp = GRADE_POINTS[r.grade];
     if(gp===undefined) return;
     const existing = map.get(r.code);
@@ -689,20 +903,49 @@ function computeCGPA(){
 }
 
 function creditsEarned(){
-  const best = bestAttemptsMap();
+  const best = bestAttemptsMap(); // excludes NON_QUALIFYING from GPA map
   let earned = 0;
   const earnedGroups = new Set();
+
+  // 1. Normal graded passes (bestAttemptsMap already excludes NON_QUALIFYING)
   best.forEach(r=>{
     const course = courseByCode(r.code);
     if(!course) return;
     if(GRADE_POINTS[r.grade] > 0){
       if(course.group){
-        if(earnedGroups.has(course.group)) return; // only count one course per group
+        if(earnedGroups.has(course.group)) return;
         earnedGroups.add(course.group);
       }
       earned += course.credits;
     }
   });
+
+  // 2. NON_QUALIFYING_COURSES (e.g. MAT116): taken & paid, count toward degree, NOT GPA
+  NON_QUALIFYING_COURSES.forEach(code=>{
+    const course = courseByCode(code);
+    if(!course) return;
+    // Count only if they actually have a passing record
+    const hasPassing = records.some(r=> r.code===code && GRADE_POINTS[r.grade] > 0);
+    if(!hasPassing) return;
+    if(course.group){
+      if(earnedGroups.has(course.group)) return;
+      earnedGroups.add(course.group);
+    }
+    earned += course.credits;
+  });
+
+  // 3. WAIVER_COURSES (e.g. ENG102): auto-credited by NSU, no record, no fee, no GPA
+  WAIVER_COURSES.forEach(code=>{
+    if(best.has(code)) return; // already counted if somehow graded
+    const course = courseByCode(code);
+    if(!course) return;
+    if(course.group){
+      if(earnedGroups.has(course.group)) return;
+      earnedGroups.add(course.group);
+    }
+    earned += course.credits;
+  });
+
   return earned;
 }
 
@@ -710,6 +953,8 @@ function creditsByCategory(){
   const best = bestAttemptsMap();
   const out = {}; activeCategoryOrder().forEach(c=>out[c]=0);
   const earnedGroups = new Set();
+
+  // 1. Normal graded passes
   best.forEach(r=>{
     const course = courseByCode(r.code);
     if(!course || GRADE_POINTS[r.grade] <= 0) return;
@@ -719,12 +964,44 @@ function creditsByCategory(){
     }
     out[course.cat] = (out[course.cat]||0) + course.credits;
   });
+
+  // 2. NON_QUALIFYING_COURSES
+  NON_QUALIFYING_COURSES.forEach(code=>{
+    const course = courseByCode(code);
+    if(!course) return;
+    const hasPassing = records.some(r=> r.code===code && GRADE_POINTS[r.grade] > 0);
+    if(!hasPassing) return;
+    if(course.group){
+      if(earnedGroups.has(course.group)) return;
+      earnedGroups.add(course.group);
+    }
+    out[course.cat] = (out[course.cat]||0) + course.credits;
+  });
+
+  // 3. WAIVER_COURSES
+  WAIVER_COURSES.forEach(code=>{
+    if(best.has(code)) return;
+    const course = courseByCode(code);
+    if(!course) return;
+    if(course.group){
+      if(earnedGroups.has(course.group)) return;
+      earnedGroups.add(course.group);
+    }
+    out[course.cat] = (out[course.cat]||0) + course.credits;
+  });
+
   return out;
 }
 
 function isCompleted(code, best){
   const r = best.get(code);
-  return !!r && GRADE_POINTS[r.grade] > 0;
+  if(r && GRADE_POINTS[r.grade] > 0) return true;
+  // NON_QUALIFYING with a passing record counts as completed for curriculum purposes
+  if(NON_QUALIFYING_COURSES.has(code))
+    return records.some(rec=> rec.code===code && GRADE_POINTS[rec.grade] > 0);
+  // WAIVER_COURSES are always considered completed
+  if(WAIVER_COURSES.has(code)) return true;
+  return false;
 }
 function completedGroupSatisfied(group, best){
   return activeCourses().some(c=>c.group===group && isCompleted(c.code, best));
@@ -790,6 +1067,56 @@ function renderOverview(){
       <div class="sub">${c.sub}</div>
     </div>`).join('');
 
+  const sortedHistory = [...records].sort((a,b)=> semesterSort(a.semester,b.semester));
+  const semsWithRecs = [...new Set(sortedHistory.map(r=>r.semester))].sort(semesterSort);
+
+  let totalFeesPaid = 0;
+  semsWithRecs.forEach(sem => {
+    const semRecords = sortedHistory.filter(r => r.semester === sem);
+    let semBilledCredits = 0;
+    semRecords.forEach(r => {
+      if(WAIVER_COURSES.has(r.code)) return; // waived — no tuition ever paid
+      const course = courseByCode(r.code);
+      if (course) semBilledCredits += getBilledCredits(course);
+    });
+    totalFeesPaid += computeSemesterFee(semBilledCredits, sem);
+  });
+
+  const perCredit = settings.perCreditFee !== undefined ? settings.perCreditFee : 6500;
+  const baseFee = getBaseFeeTotal();
+
+  // Compute remaining billed credits:
+  // Remaining degree credits (activeTotalCredits - earned) + uncompleted 0-credit core courses (billed as 1 cr each)
+  const completedSet = new Set([...best.keys()].filter(code => GRADE_POINTS[best.get(code).grade] > 0));
+  // NON_QUALIFYING with a passing record is completed (fee already paid)
+  NON_QUALIFYING_COURSES.forEach(code=>{
+    if(records.some(r=> r.code===code && GRADE_POINTS[r.grade] > 0)) completedSet.add(code);
+  });
+  // WAIVER_COURSES are completed (waived — no remaining fee)
+  WAIVER_COURSES.forEach(code=> completedSet.add(code));
+  let uncompletedZeroCreditCount = 0;
+  activeCourses().forEach(c => {
+    if(c.credits === 0 && !completedSet.has(c.code) && c.cat !== 'Major Elective') {
+      uncompletedZeroCreditCount++;
+    }
+  });
+
+  const remainingBilledCredits = remaining + uncompletedZeroCreditCount;
+  const estRemainingFees = (remainingBilledCredits * perCredit) + (semLeft * baseFee);
+  const totalDegreeCost = totalFeesPaid + estRemainingFees;
+
+  const fCards = [
+    {label:'Total Fees Paid', value:formatCurrency(totalFeesPaid), sub:`Across ${semsWithRecs.length} recorded semester${semsWithRecs.length===1?'':'s'}`, cls:'trace'},
+    {label:'Est. Remaining Fees', value:formatCurrency(estRemainingFees), sub:`For ~${remaining} degree cr (${remainingBilledCredits} billed cr, ${semLeft} sem)`},
+    {label:'Est. Total Degree Cost', value:formatCurrency(totalDegreeCost), sub:`Rate: ৳${perCredit.toLocaleString()}/cr + ৳${baseFee.toLocaleString()} base`},
+  ];
+  document.getElementById('feeCards').innerHTML = fCards.map(c=>`
+    <div class="card ${c.cls||''}">
+      <div class="label">${c.label}</div>
+      <div class="value" style="font-size:24px;">${c.value}</div>
+      <div class="sub">${c.sub}</div>
+    </div>`).join('');
+
   const byCat = creditsByCategory();
   document.getElementById('categoryBars').innerHTML = activeCategoryOrder().map(cat=>{
     const have = byCat[cat]||0; const target = activeCategoryTargets()[cat];
@@ -810,7 +1137,7 @@ function semesterSort(a,b){
 function renderHistory(){
   const tbody = document.getElementById('historyBody');
   const sorted = [...records].sort((a,b)=> semesterSort(a.semester,b.semester) || a.code.localeCompare(b.code));
-  const best = bestAttemptsMap();
+  const globalBest = bestAttemptsMap();
 
   if(sorted.length===0){
     tbody.innerHTML = '';
@@ -823,35 +1150,156 @@ function renderHistory(){
   const countByCode = {};
   records.forEach(r=> countByCode[r.code]=(countByCode[r.code]||0)+1 );
 
-  tbody.innerHTML = sorted.map(r=>{
-    const course = courseByCode(r.code) || {name:'(unknown course)', credits:'—'};
-    const bestRec = best.get(r.code);
-    const isOld = countByCode[r.code]>1 && (!bestRec || bestRec.id !== r.id);
-    let statusPill = '';
-    if(NEUTRAL_GRADES.includes(r.grade)){
-      statusPill = `<span class="pill">${r.grade==='W'?'Withdrawn':'Incomplete'}</span>`;
-    } else if(isOld){
-      statusPill = `<span class="pill lock">Superseded</span>`;
-    } else if(GRADE_POINTS[r.grade]===0){
-      statusPill = `<span class="pill warn">Failed</span>`;
-    } else if(countByCode[r.code]>1){
-      statusPill = `<span class="pill ok">Retaken ✓</span>`;
-    } else {
-      statusPill = `<span class="pill ok">Counted</span>`;
-    }
-    return `<tr class="${isOld?'retake-old':''}">
-      <td>${r.semester}</td>
-      <td class="code">${r.code}</td>
-      <td>${course.name}</td>
-      <td>${course.credits}</td>
-      <td>${r.grade}</td>
-      <td>${statusPill}</td>
-      <td style="white-space:nowrap;">
-        <button class="action" onclick="editRecord('${r.id}')">Edit</button>
-        <button class="action" onclick="deleteRecord('${r.id}')">Delete</button>
+  // group by semester chronologically
+  const semestersWithRecords = [...new Set(sorted.map(r=>r.semester))].sort(semesterSort);
+
+  let html = '';
+
+  semestersWithRecords.forEach(sem => {
+    const semRecords = sorted.filter(r => r.semester === sem);
+
+    // Semester Credit & TGPA calculation
+    let semTotalCredits = 0;
+    let semQP = 0;
+    let semAttemptedCredits = 0;
+
+    semRecords.forEach(r => {
+      const course = courseByCode(r.code);
+      const credits = (course && typeof course.credits === 'number') ? course.credits : 0;
+      semTotalCredits += credits;
+      // NON_QUALIFYING courses count toward semester credit total (taken & paid)
+      // but are excluded from TGPA quality points (NSU Cr.Count = 0)
+      if(NON_QUALIFYING_COURSES.has(r.code)) return;
+      if (!NEUTRAL_GRADES.includes(r.grade)) {
+        const gp = GRADE_POINTS[r.grade];
+        if (gp !== undefined) {
+          semAttemptedCredits += credits;
+          semQP += credits * gp;
+        }
+      }
+    });
+    const tgpa = semAttemptedCredits > 0 ? (semQP / semAttemptedCredits) : 0;
+
+    // Cumulative CGPA up to and including this semester (NSU policy: best attempt per course up to this point)
+    const recordsUpToSem = records.filter(r => semesterSort(r.semester, sem) <= 0);
+    const bestUpToSem = new Map();
+    recordsUpToSem.forEach(r => {
+      if (NEUTRAL_GRADES.includes(r.grade)) return;
+      if (NON_QUALIFYING_COURSES.has(r.code)) return; // excluded from CGPA
+      const gp = GRADE_POINTS[r.grade];
+      if (gp === undefined) return;
+      const existing = bestUpToSem.get(r.code);
+      if (!existing || gp > GRADE_POINTS[existing.grade]) {
+        bestUpToSem.set(r.code, r);
+      }
+    });
+
+    let cumQP = 0;
+    let cumAttemptedCredits = 0;
+    bestUpToSem.forEach(r => {
+      const course = courseByCode(r.code);
+      if (!course || typeof course.credits !== 'number') return;
+      cumAttemptedCredits += course.credits;
+      cumQP += course.credits * GRADE_POINTS[r.grade];
+    });
+    const cgpa = cumAttemptedCredits > 0 ? (cumQP / cumAttemptedCredits) : 0;
+
+    // Render course rows for this semester
+    semRecords.forEach((r, idx) => {
+      const course = courseByCode(r.code) || {name:'(unknown course)', credits:'—'};
+      const bestRec = globalBest.get(r.code);
+      const isOld = countByCode[r.code]>1 && (!bestRec || bestRec.id !== r.id);
+      let statusPill = '';
+      if(NON_QUALIFYING_COURSES.has(r.code)){
+        statusPill = `<span class="pill" style="background:var(--teal,#0d9488);color:#fff;">Non-qualifying (no GPA)</span>`;
+      } else if(NEUTRAL_GRADES.includes(r.grade)){
+        statusPill = `<span class="pill">${r.grade==='W'?'Withdrawn':'Incomplete'}</span>`;
+      } else if(isOld){
+        statusPill = `<span class="pill lock">Superseded</span>`;
+      } else if(GRADE_POINTS[r.grade]===0){
+        statusPill = `<span class="pill warn">Failed</span>`;
+      } else if(countByCode[r.code]>1){
+        statusPill = `<span class="pill ok">Retaken ✓</span>`;
+      } else {
+        statusPill = `<span class="pill ok">Counted</span>`;
+      }
+
+      const semCell = idx === 0 ? `<b style="color:var(--ink);">${r.semester}</b>` : '';
+
+      html += `<tr class="${isOld?'retake-old':''}">
+        <td>${semCell}</td>
+        <td class="code">${r.code}</td>
+        <td>${course.name}</td>
+        <td>${course.credits}</td>
+        <td>${r.grade}</td>
+        <td>${statusPill}</td>
+        <td style="white-space:nowrap;">
+          <button class="action" onclick="editRecord('${r.id}')">Edit</button>
+          <button class="action" onclick="deleteRecord('${r.id}')">Delete</button>
+        </td>
+      </tr>`;
+    });
+
+    let semBilledCredits = 0;
+    semRecords.forEach(r => {
+      if(WAIVER_COURSES.has(r.code)) return; // waived — no tuition billed
+      const course = courseByCode(r.code);
+      if (course) semBilledCredits += getBilledCredits(course);
+    });
+
+    const semFee = computeSemesterFee(semBilledCredits, sem);
+    const isOverridden = settings.semesterFeeOverrides && settings.semesterFeeOverrides[sem] !== undefined && settings.semesterFeeOverrides[sem] !== null;
+    const feeBadge = isOverridden ? ` <span style="font-size:10px; color:var(--amber);">(Custom)</span>` : '';
+
+    // Summary row per semester matching PDF format + Fee tracking
+    html += `<tr class="sem-summary-tr">
+      <td colspan="7">
+        <div class="sem-summary-content">
+          <span>Semester Credit : <b>${semTotalCredits.toFixed(2)}</b></span>
+          <span>TGPA : <b>${roundTo2(tgpa).toFixed(2)}</b></span>
+          <span>CGPA : <b>${roundTo2(cgpa).toFixed(2)}</b></span>
+          <span>Fee : <b>${formatCurrency(semFee)}</b>${feeBadge} <button class="action" style="margin-left:6px; font-size:10px; padding:2px 6px;" onclick="openFeeOverrideModal('${sem.replace(/'/g,"\\'")}', ${semFee})">Edit Fee</button></span>
+        </div>
       </td>
     </tr>`;
-  }).join('');
+  });
+
+  // ── Waived Courses section (prepended at the very top) ────────────────────
+  // These courses have no records — they are auto-awarded by NSU (waiver/transfer).
+  const waivedCourses = [...WAIVER_COURSES]
+    .map(code => courseByCode(code))
+    .filter(Boolean);
+
+  let waivedHtml = '';
+  if(waivedCourses.length > 0){
+    waivedHtml += `<tr>
+      <td colspan="7" style="padding:10px 12px 4px; border-bottom:2px solid var(--teal,#0d9488);">
+        <b style="color:var(--teal,#0d9488); font-size:13px; letter-spacing:.04em;">WAIVED COURSES</b>
+        <span style="font-size:11px; color:var(--ink-faint); margin-left:8px;">Credited by NSU — no grade, no fee, no GPA impact</span>
+      </td>
+    </tr>`;
+    waivedCourses.forEach(course => {
+      waivedHtml += `<tr>
+        <td><b style="color:var(--ink);">Waived</b></td>
+        <td class="code">${course.code}</td>
+        <td>${course.name}</td>
+        <td>${course.credits}</td>
+        <td>—</td>
+        <td><span class="pill" style="background:var(--teal,#0d9488);color:#fff;">Waived ✓</span></td>
+        <td></td>
+      </tr>`;
+    });
+    waivedHtml += `<tr class="sem-summary-tr">
+      <td colspan="7">
+        <div class="sem-summary-content">
+          <span>Waived Credits : <b>${waivedCourses.reduce((s,c)=>s+c.credits,0).toFixed(2)}</b></span>
+          <span style="color:var(--ink-faint); font-size:11px;">Counted toward degree, excluded from GPA &amp; fees</span>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  tbody.innerHTML = waivedHtml + html;
 }
 
 /* =========================================================
@@ -913,89 +1361,169 @@ function renderCurriculum(){
    RECOMMENDATION ENGINE
    ========================================================= */
 function buildRecommendation(){
-  const best = bestAttemptsMap();
+  const best = bestAttemptsMap(); // excludes NON_QUALIFYING from GPA map
   const totalEarned = creditsEarned();
   const target = settings.targetCredits || 15;
+  const preferredTrail = settings.preferredElectiveTrail || 'all';
 
-  // Only PASSED courses count as "done" for prerequisite purposes.
-  // Courses whose best attempt is an F still need a retake before anything downstream unlocks.
+  // 1. Initial simulated completed set:
+  //    - Passed graded courses
+  //    - NON_QUALIFYING courses with a passing grade (e.g. MAT116)
+  //    - WAIVER courses (e.g. ENG102)
   let simulatedCompleted = new Set(
     [...best.keys()].filter(code => GRADE_POINTS[best.get(code).grade] > 0)
   );
+  NON_QUALIFYING_COURSES.forEach(code=>{
+    if(records.some(r=> r.code===code && GRADE_POINTS[r.grade] > 0)) simulatedCompleted.add(code);
+  });
+  WAIVER_COURSES.forEach(code=> simulatedCompleted.add(code));
+
+  // Courses whose current best attempt is an F (must be retaken)
   let pendingRetakes = new Set(
     [...best.keys()].filter(code => GRADE_POINTS[best.get(code).grade] === 0)
   );
+
   let simulatedCredits = totalEarned;
-  let simulatedElectivesTaken = activeCourses().filter(c=>c.cat==='Major Elective' && simulatedCompleted.has(c.code)).length;
-  let simulatedOpenTaken = simulatedCompleted.has('OPEN1');
+  const initialCategoryCredits = creditsByCategory();
+  const simulatedCategoryCredits = { ...initialCategoryCredits };
+  const catTargets = activeCategoryTargets();
+
   const plan = [];
 
+  // Prerequisite check helper
   const isPrereqSatisfied = (p) => {
-    if(typeof p==='object') return simulatedCredits >= p.minCredits;
+    if(typeof p === 'object') return simulatedCredits >= p.minCredits;
     const pc = courseByCode(p);
-    if(pc && pc.group) return [...simulatedCompleted].some(code=>{const cc=courseByCode(code); return cc && cc.group===pc.group;});
+    if(pc && pc.group){
+      return [...simulatedCompleted].some(code => {
+        const cc = courseByCode(code);
+        return cc && cc.group === pc.group;
+      });
+    }
     return simulatedCompleted.has(p);
   };
 
-  for(let sem=0; sem<8 && simulatedCredits < activeTotalCredits(); sem++){
-    // retakes are always "available" (already unlocked before) and get top priority
-    const retakeCourses = activeCourses().filter(c=>pendingRetakes.has(c.code));
+  // Up to 8 future terms
+  for(let sem = 0; sem < 8 && simulatedCredits < activeTotalCredits(); sem++){
+    // Retakes always take first priority
+    const retakeCourses = activeCourses().filter(c => pendingRetakes.has(c.code));
 
-    const newAvailable = activeCourses().filter(c=>{
+    const newAvailable = activeCourses().filter(c => {
       if(simulatedCompleted.has(c.code) || pendingRetakes.has(c.code)) return false;
-      if(c.group && [...simulatedCompleted].some(code=>{const cc=courseByCode(code); return cc && cc.group===c.group;})) return false;
-      if(c.cat==='Major Elective' && simulatedElectivesTaken>=3) return false;
-      if(c.cat==='Open Elective' && simulatedOpenTaken) return false;
+
+      // Group deduplication (e.g. ECO101 vs ECO104, SOC101 vs ENV203)
+      if(c.group && [...simulatedCompleted].some(code => {
+        const cc = courseByCode(code);
+        return cc && cc.group === c.group;
+      })) return false;
+
+      // Category quota check: do not schedule if category credits already fulfilled
+      const currentCatCr = simulatedCategoryCredits[c.cat] || 0;
+      const targetCatCr = catTargets[c.cat];
+      if(targetCatCr !== undefined && currentCatCr >= targetCatCr) return false;
+
+      // Capstone sequence check: Senior Design II requires Senior Design I
+      if(c.code === 'CSE499B' && !simulatedCompleted.has('CSE499A')) return false;
+
+      // Check all prerequisites
       return c.pre.every(isPrereqSatisfied);
     });
 
     const availableNow = [...retakeCourses, ...newAvailable];
-    if(availableNow.length===0) break;
+    if(availableNow.length === 0) break;
 
-    // unlock score: how many other not-yet-completed courses list this course as prereq
+    // Forward unlock impact score (how many remaining uncompleted courses unlock next)
     function unlockScore(code){
-      return activeCourses().filter(c=> c.pre.some(p=> typeof p==='string' && p===code) && !simulatedCompleted.has(c.code)).length;
+      return activeCourses().filter(c =>
+        c.pre.some(p => (typeof p === 'string' && p === code)) &&
+        !simulatedCompleted.has(c.code)
+      ).length;
     }
 
-    const scored = availableNow.map(c=>({
-      c,
-      score: (pendingRetakes.has(c.code) ? 6 : 0)
-             + (c.cat==='CSE Major Core'?3:c.cat==='SEPS Core'?2.5:c.cat==='University Core'?1.5:c.cat==='Capstone'?4:1)
-             + unlockScore(c.code)*0.7
-             - (parseInt(c.code.replace(/\D/g,''))||0)*0.002
-    })).sort((a,b)=>b.score-a.score);
+    const scored = availableNow.map(c => {
+      let score = 0;
+      if(pendingRetakes.has(c.code)) score += 8.0; // retakes top priority
 
-    // pick courses up to target credits, bundling lab pairs
+      // Core category priority weights
+      if(c.cat === 'CSE Major Core') score += 4.5;
+      else if(c.cat === 'SEPS Core') score += 3.5;
+      else if(c.cat === 'University Core') score += 2.0;
+      else if(c.cat === 'Capstone') score += 5.0;
+      else if(c.cat === 'Major Elective') {
+        score += 1.5;
+        if(preferredTrail !== 'all' && c.trail === preferredTrail) score += 3.0;
+      } else if(c.cat === 'Open Elective') {
+        score += 1.2;
+      }
+
+      // Chain unlock multiplier
+      score += unlockScore(c.code) * 0.9;
+
+      // Prefer lower 100/200 level foundational courses earlier
+      const courseNum = parseInt(c.code.replace(/\D/g, '')) || 0;
+      score -= courseNum * 0.002;
+
+      return { c, score };
+    }).sort((a, b) => b.score - a.score);
+
+    // Pick courses up to target credits, respecting lab bundles and category targets
     const chosen = [];
     let creditSum = 0;
     const chosenCodes = new Set();
-    let electivesPickedThisPass = 0;
-    let openPickedThisPass = false;
-    for(const {c} of scored){
+    const semCategoryDelta = {};
+
+    for(const { c } of scored){
       if(chosenCodes.has(c.code)) continue;
       if(creditSum >= target) break;
-      if(c.cat==='Major Elective' && (simulatedElectivesTaken + electivesPickedThisPass) >= 3) continue;
-      if(c.cat==='Open Elective' && (simulatedOpenTaken || openPickedThisPass)) continue;
+
+      // Check if adding this course would exceed category target
+      const plannedCatCr = (simulatedCategoryCredits[c.cat] || 0) + (semCategoryDelta[c.cat] || 0);
+      const targetCatCr = catTargets[c.cat];
+      if(targetCatCr !== undefined && plannedCatCr >= targetCatCr) continue;
+
       let bundle = [c];
-      const pairLab = availableNow.find(x=>x.pairWith===c.code);
-      if(pairLab && !chosenCodes.has(pairLab.code)) bundle.push(pairLab);
-      const bundleCredits = bundle.reduce((s,x)=>s+x.credits,0);
-      if(creditSum + bundleCredits > target + 2) continue; // avoid big overshoot
-      bundle.forEach(b=>{ chosen.push(b); chosenCodes.add(b.code); });
+      const pairLab = availableNow.find(x => x.pairWith === c.code);
+      if(pairLab && !chosenCodes.has(pairLab.code)){
+        bundle.push(pairLab);
+      }
+      const bundleCredits = bundle.reduce((s, x) => s + (x.credits || 0), 0);
+
+      // Avoid big overshoot beyond target credits
+      if(creditSum + bundleCredits > target + 2 && creditSum > 0) continue;
+
+      bundle.forEach(b => {
+        chosen.push(b);
+        chosenCodes.add(b.code);
+        semCategoryDelta[b.cat] = (semCategoryDelta[b.cat] || 0) + (b.credits || 0);
+      });
       creditSum += bundleCredits;
-      if(c.cat==='Major Elective') electivesPickedThisPass++;
-      if(c.cat==='Open Elective') openPickedThisPass = true;
     }
 
-    if(chosen.length===0) break;
+    if(chosen.length === 0) break;
 
-    plan.push({semester: SEMESTERS[Math.min(SEMESTERS.length-1, plan.length)], courses: chosen, credits: creditSum, retakes: chosen.filter(c=>pendingRetakes.has(c.code)).map(c=>c.code)});
+    // Determine target semester name based on past semesters
+    const pastSems = [...new Set(records.map(r => r.semester))].sort(semesterSort);
+    const lastSem = pastSems.length > 0 ? pastSems[pastSems.length - 1] : null;
+    let semLabel = '';
+    if(lastSem && SEMESTERS.includes(lastSem)){
+      const nextIdx = SEMESTERS.indexOf(lastSem) + 1 + plan.length;
+      if(nextIdx < SEMESTERS.length) semLabel = SEMESTERS[nextIdx];
+    }
+    if(!semLabel){
+      semLabel = SEMESTERS[Math.min(SEMESTERS.length - 1, plan.length)];
+    }
 
-    chosen.forEach(c=>{
+    plan.push({
+      semester: semLabel,
+      courses: chosen,
+      credits: creditSum,
+      retakes: chosen.filter(c => pendingRetakes.has(c.code)).map(c => c.code)
+    });
+
+    chosen.forEach(c => {
       simulatedCompleted.add(c.code);
       pendingRetakes.delete(c.code);
-      if(c.cat==='Major Elective') simulatedElectivesTaken++;
-      if(c.cat==='Open Elective') simulatedOpenTaken = true;
+      simulatedCategoryCredits[c.cat] = (simulatedCategoryCredits[c.cat] || 0) + (c.credits || 0);
     });
     simulatedCredits += creditSum;
   }
@@ -1005,55 +1533,328 @@ function buildRecommendation(){
 
 function renderRecommendations(){
   document.getElementById('targetCredits').value = settings.targetCredits;
+  const trailSelect = document.getElementById('recElectiveTrail');
+  if(trailSelect && settings.preferredElectiveTrail){
+    trailSelect.value = settings.preferredElectiveTrail;
+  }
 
   const plan = buildRecommendation();
-  const remaining = activeTotalCredits() - creditsEarned();
+  const earned = creditsEarned();
+  const total = activeTotalCredits();
+  const remaining = Math.max(0, total - earned);
   const container = document.getElementById('recBody');
+  const summaryContainer = document.getElementById('recSummary');
 
-  if(remaining<=0){
-    container.innerHTML = `<div class="empty-note">All 130 credits are accounted for — congratulations, no further courses to recommend. Double-check your degree audit in RDS to confirm.</div>`;
-    return;
-  }
-  if(plan.length===0){
-    container.innerHTML = `<div class="empty-note">No available courses could be planned — this usually means some prerequisites are missing from your Grade History, or the curriculum data needs a manual check. Add more completed courses under Grade History and revisit this tab.</div>`;
+  if(remaining <= 0){
+    if(summaryContainer) summaryContainer.innerHTML = '';
+    container.innerHTML = `<div class="empty-note">All ${total} credits are accounted for — congratulations, no further courses to recommend! Double-check your degree audit in NSU RDS portal to verify degree completion.</div>`;
     return;
   }
 
-  container.innerHTML = plan.map((sem, i)=>{
-    const reasonFor = (c)=>{
-      if(sem.retakes && sem.retakes.includes(c.code)) return 'Retake — previous attempt was an F';
-      if(c.cat==='Capstone') return 'Capstone milestone — schedule deliberately';
-      const unlocks = activeCourses().filter(x=>x.pre.some(p=>p===c.code)).length;
-      if(unlocks>0) return `Unlocks ${unlocks} later course${unlocks>1?'s':''}`;
-      if(c.cat==='Major Elective') return `${c.trail} trail elective`;
-      return 'Required core course';
+  // Summary Metrics Bar
+  if(summaryContainer){
+    const plannedCr = plan.reduce((s, sem) => s + sem.credits, 0);
+    const totalCourses = plan.reduce((s, sem) => s + sem.courses.filter(c => !(c.credits === 0 && c.pairWith)).length, 0);
+    const estSemesters = plan.length;
+
+    summaryContainer.innerHTML = `
+      <div class="rec-summary-bar">
+        <div class="rec-summary-card">
+          <div class="lbl">Credits Remaining</div>
+          <div class="val" style="color:var(--amber);">${remaining} cr</div>
+          <div class="sub">${earned} of ${total} earned</div>
+        </div>
+        <div class="rec-summary-card">
+          <div class="lbl">Planned Semesters</div>
+          <div class="val">${estSemesters} sem</div>
+          <div class="sub">@ ${settings.targetCredits} cr/term target</div>
+        </div>
+        <div class="rec-summary-card">
+          <div class="lbl">Scheduled Courses</div>
+          <div class="val">${totalCourses} courses</div>
+          <div class="sub">${plannedCr} credits mapped</div>
+        </div>
+      </div>
+    `;
+  }
+
+  if(plan.length === 0){
+    container.innerHTML = `<div class="empty-note">No available courses could be planned — this usually means required prerequisites are missing from your Grade History, or courses need to be unlocked. Check the Curriculum Map to see unfulfilled prerequisites.</div>`;
+    return;
+  }
+
+  container.innerHTML = plan.map((sem, i) => {
+    const reasonFor = (c) => {
+      if(sem.retakes && sem.retakes.includes(c.code)) return 'Retake — resolve previous F grade';
+      if(c.code === 'CSE499A') return 'Senior Design I (Capstone start)';
+      if(c.code === 'CSE499B') return 'Senior Design II (Final Capstone)';
+      if(c.cat === 'Capstone') return 'Capstone milestone requirement';
+      const unlocks = activeCourses().filter(x => x.pre.some(p => p === c.code)).length;
+      if(unlocks > 0) return `Unlocks ${unlocks} downstream course${unlocks > 1 ? 's' : ''}`;
+      if(c.cat === 'Major Elective') return `${c.trail || 'General'} elective`;
+      if(c.cat === 'Open Elective') return 'Open elective requirement';
+      return `Required ${c.cat}`;
     };
 
-    // 0-credit labs are bundled into their theory course and can't be taken alone —
-    // fold them into the parent course's line instead of listing them separately.
+    // Workload intensity rating
+    let workloadClass = 'balanced';
+    let workloadText = 'Balanced load';
+    if(sem.credits >= 16){
+      workloadClass = 'intense';
+      workloadText = 'Heavy load';
+    } else if(sem.credits >= 13){
+      workloadClass = 'heavy';
+      workloadText = 'Standard load';
+    }
+
+    // 0-credit bundled labs folded into parent course row
     const zeroCreditLabs = sem.courses.filter(c => c.credits === 0 && c.pairWith);
     const visibleCourses = sem.courses.filter(c => !(c.credits === 0 && c.pairWith));
 
     return `<div class="rec-sem">
-      <h4>Suggested Semester ${i+1} <span>${sem.credits} credits</span></h4>
+      <h4>
+        <span>Suggested Semester ${i + 1} &nbsp;<span style="color:var(--ink-dim); font-size:12px;">(${sem.semester})</span></span>
+        <div class="rec-sem-meta">
+          <span class="workload-pill ${workloadClass}">${workloadText}</span>
+          <span class="cr-badge">${sem.credits} credits</span>
+        </div>
+      </h4>
       <ul class="rec-list">
-        ${visibleCourses.map(c=>{
-          const bundledLab = zeroCreditLabs.find(l=>l.pairWith===c.code);
+        ${visibleCourses.map(c => {
+          const bundledLab = zeroCreditLabs.find(l => l.pairWith === c.code);
           const labNote = bundledLab ? ` <span style="color:var(--ink-faint);">(+ ${bundledLab.code} lab)</span>` : '';
-          return `<li><span><b class="code">${c.code}</b> — ${c.name}${labNote}</span><span class="why">${reasonFor(c)}</span></li>`;
+          const isRetake = sem.retakes && sem.retakes.includes(c.code);
+          const itemClass = isRetake ? 'retake-item' : (c.cat === 'Capstone' ? 'capstone-item' : (c.cat === 'Major Elective' ? 'elective-item' : ''));
+          return `<li class="${itemClass}">
+            <div class="rec-item-main">
+              <span><b class="code">${c.code}</b> — ${c.name}${labNote}</span>
+              <span class="cat-tag">${c.cat}</span>
+              <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-dim);">${c.credits + (bundledLab ? bundledLab.credits : 0)} cr</span>
+            </div>
+            <span class="why">${reasonFor(c)}</span>
+          </li>`;
         }).join('')}
       </ul>
     </div>`;
-  }).join('') + `<p style="color:var(--ink-faint); font-size:11.5px; font-family:var(--font-mono); margin-top:10px;">
-    This plan is a heuristic based on prerequisite chains and category needs — it doesn't know real seat availability,
-    trimester course offerings, or your schedule constraints. Use it as a starting point for advising, not a substitute for it.
+  }).join('') + `<p style="color:var(--ink-faint); font-size:11.5px; font-family:var(--font-mono); margin-top:14px; line-height:1.5;">
+    💡 <b>Recommendation Notes:</b> This roadmap automatically accounts for your passed courses, remedial courses (MAT116), waived courses (ENG102),
+    prerequisite chains, and category targets. Real semester course offerings and seat limits may vary; verify with your academic advisor before registration.
   </p>`;
+
+  renderRetakeAdvisor();
+}
+
+/* =========================================================
+   RETAKE ADVISOR ENGINE
+   Identifies highest-leverage courses to retake for CGPA boost
+   ========================================================= */
+function renderRetakeAdvisor(){
+  const container = document.getElementById('retakeAdvisorContainer');
+  if(!container) return;
+
+  const currentStatus = computeCGPA();
+  const currentCGPA = currentStatus.cgpa;
+  const currentQP = currentStatus.qp;
+  const currentAttempted = currentStatus.creditsAttempted;
+
+  if(currentAttempted <= 0){
+    container.innerHTML = '';
+    return;
+  }
+
+  const targetCGPA = settings.targetCgpa !== undefined ? Number(settings.targetCgpa) : 3.0;
+  const expectedGrade = settings.retakeExpectedGrade || 'B+';
+  const expectedGP = GRADE_POINTS[expectedGrade] !== undefined ? GRADE_POINTS[expectedGrade] : 3.3;
+
+  const best = bestAttemptsMap();
+
+  // Find all graded courses eligible for retake (grade < expectedGP and non-zero credits)
+  const retakeCandidates = [];
+  best.forEach(r => {
+    // Exclude non-graded / non-qualifying
+    if(NON_QUALIFYING_COURSES.has(r.code)) return;
+    const course = courseByCode(r.code);
+    if(!course || typeof course.credits !== 'number' || course.credits <= 0) return;
+
+    const currentGrade = r.grade;
+    const currentCourseGP = GRADE_POINTS[currentGrade];
+    if(currentCourseGP === undefined) return;
+
+    // Only suggest if retaking to expectedGP actually yields a positive grade point difference
+    const pointDiff = expectedGP - currentCourseGP;
+    if(pointDiff <= 0) return;
+
+    const qpGain = course.credits * pointDiff;
+    // Simulated CGPA if ONLY this single course is retaken to expectedGrade
+    const singleNewCGPA = (currentQP + qpGain) / currentAttempted;
+    const cgpaBoost = singleNewCGPA - currentCGPA;
+
+    retakeCandidates.push({
+      code: r.code,
+      name: course.name,
+      credits: course.credits,
+      currentGrade,
+      currentCourseGP,
+      pointDiff,
+      qpGain,
+      cgpaBoost,
+      newCGPA: singleNewCGPA
+    });
+  });
+
+  // Sort candidates by highest CGPA impact first, then by credits
+  retakeCandidates.sort((a, b) => b.cgpaBoost - a.cgpaBoost || b.credits - a.credits);
+
+  // Calculate cumulative retake path to reach or approach targetCGPA
+  let runningQP = currentQP;
+  let runningCGPA = currentCGPA;
+  const recommendedSequence = [];
+
+  for(const item of retakeCandidates){
+    runningQP += item.qpGain;
+    runningCGPA = runningQP / currentAttempted;
+    recommendedSequence.push({
+      ...item,
+      cumulativeCGPA: runningCGPA,
+      totalGain: runningCGPA - currentCGPA
+    });
+    if(runningCGPA >= targetCGPA) break;
+  }
+
+  const qpDeficit = Math.max(0, (targetCGPA * currentAttempted) - currentQP);
+  const reached = runningCGPA >= targetCGPA;
+  const gap = Math.max(0, targetCGPA - currentCGPA);
+
+  let statusBadgeHtml = '';
+  if(currentCGPA >= targetCGPA){
+    statusBadgeHtml = `<span class="workload-pill balanced" style="font-size:11px;">Target Already Met (${roundTo2(currentCGPA).toFixed(2)} ≥ ${targetCGPA.toFixed(2)})</span>`;
+  } else if(reached){
+    statusBadgeHtml = `<span class="workload-pill balanced" style="font-size:11px;">Achievable in ${recommendedSequence.length} retake${recommendedSequence.length > 1 ? 's' : ''}</span>`;
+  } else {
+    statusBadgeHtml = `<span class="workload-pill heavy" style="font-size:11px;">High Target (Max retake pool reaches ${roundTo2(runningCGPA).toFixed(2)})</span>`;
+  }
+
+  let tableRowsHtml = '';
+  if(retakeCandidates.length === 0){
+    tableRowsHtml = `<tr><td colspan="7" style="text-align:center; padding:18px; color:var(--ink-faint);">
+      No eligible courses found with grades below your expected retake grade (${expectedGrade} / ${expectedGP.toFixed(1)}).
+    </td></tr>`;
+  } else {
+    tableRowsHtml = retakeCandidates.map((c, idx) => {
+      const isRecommended = recommendedSequence.some(x => x.code === c.code);
+      const rowStyle = isRecommended ? 'background:rgba(251,191,36,.04);' : '';
+      const recBadge = isRecommended
+        ? `<span class="pill ok" style="font-size:10px;">Pick #${recommendedSequence.findIndex(x=>x.code===c.code)+1}</span>`
+        : `<span class="pill" style="font-size:10px; opacity:.6;">Optional</span>`;
+
+      return `<tr style="${rowStyle}">
+        <td><b class="code">${c.code}</b></td>
+        <td>${c.name}</td>
+        <td>${c.credits} cr</td>
+        <td><span class="pill ${c.currentGrade==='F'?'warn':''}">${c.currentGrade} (${c.currentCourseGP.toFixed(1)})</span></td>
+        <td><span style="color:var(--emerald,#34d399); font-weight:600;">${expectedGrade} (${expectedGP.toFixed(1)})</span></td>
+        <td><span class="diff-badge ${c.cgpaBoost>=0.05?'gain-high':'gain-med'}">+${c.cgpaBoost.toFixed(2)}</span></td>
+        <td>${recBadge}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  const expectedOptions = ['A', 'A-', 'B+', 'B', 'B-', 'C+'].map(g =>
+    `<option value="${g}" ${g === expectedGrade ? 'selected' : ''}>${g} (${GRADE_POINTS[g].toFixed(1)})</option>`
+  ).join('');
+
+  container.innerHTML = `
+    <div class="retake-advisor-card">
+      <div class="title-row">
+        <div>
+          <h3 style="margin:0; font-family:var(--font-display); font-size:16px; display:flex; align-items:center; gap:10px;">
+            Target CGPA Retake Advisor
+            ${statusBadgeHtml}
+          </h3>
+          <p style="margin:4px 0 0; color:var(--ink-faint); font-size:12px; font-family:var(--font-mono);">
+            Simulate which low-grade courses to repeat for maximum CGPA uplift with realistic modest expectations.
+          </p>
+        </div>
+        <div class="retake-controls">
+          <div class="control-item">
+            <label>Target CGPA</label>
+            <input type="number" id="retakeTargetCgpa" min="2.00" max="4.00" step="0.05" value="${targetCGPA.toFixed(2)}" style="width:105px;">
+          </div>
+          <div class="control-item">
+            <label>Expected Grade</label>
+            <select id="retakeExpectedGradeSelect" style="width:130px;">
+              ${expectedOptions}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <div class="retake-metric-pill">Current CGPA: <b>${roundTo2(currentCGPA).toFixed(2)}</b></div>
+        <div class="retake-metric-pill">Target CGPA: <b>${targetCGPA.toFixed(2)}</b></div>
+        <div class="retake-metric-pill">CGPA Gap: <b style="color:${gap > 0 ? 'var(--amber)' : 'var(--emerald,#34d399)'};">${gap > 0 ? '+' + gap.toFixed(2) : 'Achieved'}</b></div>
+        <div class="retake-metric-pill">Quality Points Needed: <b>${qpDeficit > 0 ? qpDeficit.toFixed(1) + ' pts' : '0 pts'}</b></div>
+      </div>
+
+      ${currentCGPA < targetCGPA && recommendedSequence.length > 0 ? `
+        <div style="background:var(--panel-2); border-left:3px solid var(--amber); border-radius:4px; padding:10px 14px; font-size:12.5px; margin-bottom:12px; font-family:var(--font-mono);">
+          🎯 <b>Recommended Strategy:</b> Retake <b>${recommendedSequence.length}</b> course${recommendedSequence.length > 1 ? 's' : ''} (${recommendedSequence.map(x=>x.code).join(', ')}) with a modest expected grade of <b>${expectedGrade}</b> to lift your CGPA from <b>${roundTo2(currentCGPA).toFixed(2)}</b> to <b>${roundTo2(recommendedSequence[recommendedSequence.length-1].cumulativeCGPA).toFixed(2)}</b>.
+        </div>
+      ` : ''}
+
+      <div style="overflow-x:auto;">
+        <table class="retake-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Course</th>
+              <th>Credits</th>
+              <th>Current</th>
+              <th>Expected</th>
+              <th>CGPA Boost</th>
+              <th>Recommendation</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRowsHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <p style="color:var(--ink-faint); font-size:11px; font-family:var(--font-mono); margin:12px 0 0; line-height:1.4;">
+        ℹ️ NSU grade replacement policy overwrites the old grade point in your cumulative CGPA with the higher attempt.
+        Calculations assume retakes are passed at the selected realistic grade (${expectedGrade}) across your currently attempted credits (${currentAttempted} cr).
+      </p>
+    </div>
+  `;
+
+  // Attach event listeners for dynamic interactivity
+  const targetInput = document.getElementById('retakeTargetCgpa');
+  if(targetInput){
+    targetInput.addEventListener('change', (e) => {
+      let val = parseFloat(e.target.value) || 3.0;
+      val = Math.max(2.0, Math.min(4.0, val));
+      settings.targetCgpa = val;
+      saveSettings();
+      renderRetakeAdvisor();
+    });
+  }
+
+  const gradeSelect = document.getElementById('retakeExpectedGradeSelect');
+  if(gradeSelect){
+    gradeSelect.addEventListener('change', (e) => {
+      settings.retakeExpectedGrade = e.target.value;
+      saveSettings();
+      renderRetakeAdvisor();
+    });
+  }
 }
 
 /* =========================================================
    MODAL / FORM LOGIC
    ========================================================= */
 const modalOverlay = document.getElementById('modalOverlay');
+
 function openModal(recordId){
   document.getElementById('fRecordId').value = recordId || '';
   document.getElementById('modalTitle').textContent = recordId ? 'Edit Course Record' : 'Add Course Record';
@@ -1085,6 +1886,94 @@ function deleteRecord(id){
 document.getElementById('btnAddGrade').addEventListener('click', ()=>openModal(null));
 document.getElementById('btnCancel').addEventListener('click', closeModal);
 modalOverlay.addEventListener('click', (e)=>{ if(e.target===modalOverlay) closeModal(); });
+
+/* ---- Fee Config Modal Wiring ---- */
+const feeConfigOverlay = document.getElementById('feeConfigOverlay');
+function updateFeeConfigTotalDisplay(){
+  const act = parseInt(document.getElementById('fcActivity').value)||0;
+  const comp = parseInt(document.getElementById('fcCompLab').value)||0;
+  const lib = parseInt(document.getElementById('fcLibrary').value)||0;
+  const sci = parseInt(document.getElementById('fcSciLab').value)||0;
+  const std = parseInt(document.getElementById('fcStudioLab').value)||0;
+  const tot = act + comp + lib + sci + std;
+  document.getElementById('fcTotalBaseText').textContent = formatCurrency(tot);
+}
+
+function openFeeConfigModal(){
+  const b = settings.baseFeeBreakdown || DEFAULT_BASE_FEES;
+  document.getElementById('fcPerCredit').value = settings.perCreditFee !== undefined ? settings.perCreditFee : 6500;
+  document.getElementById('fcActivity').value = b.activity !== undefined ? b.activity : 3000;
+  document.getElementById('fcCompLab').value = b.computerLab !== undefined ? b.computerLab : 2500;
+  document.getElementById('fcLibrary').value = b.library !== undefined ? b.library : 1500;
+  document.getElementById('fcSciLab').value = b.scienceLab !== undefined ? b.scienceLab : 2500;
+  document.getElementById('fcStudioLab').value = b.studioLab !== undefined ? b.studioLab : 0;
+  updateFeeConfigTotalDisplay();
+  feeConfigOverlay.classList.add('show');
+}
+function closeFeeConfigModal(){ feeConfigOverlay.classList.remove('show'); }
+
+['fcActivity','fcCompLab','fcLibrary','fcSciLab','fcStudioLab'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('input', updateFeeConfigTotalDisplay);
+});
+
+const btnOpenFeeConfig = document.getElementById('btnOpenFeeConfig');
+if(btnOpenFeeConfig) btnOpenFeeConfig.addEventListener('click', openFeeConfigModal);
+document.getElementById('btnFeeConfigCancel').addEventListener('click', closeFeeConfigModal);
+feeConfigOverlay.addEventListener('click', (e)=>{ if(e.target===feeConfigOverlay) closeFeeConfigModal(); });
+
+document.getElementById('btnFeeConfigSave').addEventListener('click', ()=>{
+  settings.perCreditFee = parseInt(document.getElementById('fcPerCredit').value)||0;
+  settings.baseFeeBreakdown = {
+    activity: parseInt(document.getElementById('fcActivity').value)||0,
+    computerLab: parseInt(document.getElementById('fcCompLab').value)||0,
+    library: parseInt(document.getElementById('fcLibrary').value)||0,
+    scienceLab: parseInt(document.getElementById('fcSciLab').value)||0,
+    studioLab: parseInt(document.getElementById('fcStudioLab').value)||0,
+  };
+  saveSettings();
+  closeFeeConfigModal();
+  renderAll();
+});
+
+/* ---- Fee Override Modal Wiring ---- */
+const feeOverrideOverlay = document.getElementById('feeOverrideOverlay');
+function openFeeOverrideModal(semName, currentFee){
+  document.getElementById('foSemester').value = semName;
+  document.getElementById('feeOverrideTitle').textContent = `Edit Fee — ${semName}`;
+  const isOverridden = settings.semesterFeeOverrides && settings.semesterFeeOverrides[semName] !== undefined && settings.semesterFeeOverrides[semName] !== null;
+  document.getElementById('feeOverrideSub').textContent = isOverridden ? `Currently set to custom amount: ${formatCurrency(currentFee)}` : `Calculated automatically based on credits & standard rates (${formatCurrency(currentFee)})`;
+  document.getElementById('foAmount').value = isOverridden ? currentFee : '';
+  feeOverrideOverlay.classList.add('show');
+}
+function closeFeeOverrideModal(){ feeOverrideOverlay.classList.remove('show'); }
+
+document.getElementById('btnFeeOverrideCancel').addEventListener('click', closeFeeOverrideModal);
+feeOverrideOverlay.addEventListener('click', (e)=>{ if(e.target===feeOverrideOverlay) closeFeeOverrideModal(); });
+
+document.getElementById('btnFeeOverrideSave').addEventListener('click', ()=>{
+  const semName = document.getElementById('foSemester').value;
+  const valRaw = document.getElementById('foAmount').value.trim();
+  if(!settings.semesterFeeOverrides) settings.semesterFeeOverrides = {};
+  if(valRaw === ''){
+    delete settings.semesterFeeOverrides[semName];
+  } else {
+    const val = parseFloat(valRaw);
+    if(isNaN(val) || val < 0){ alert('Please enter a valid fee amount.'); return; }
+    settings.semesterFeeOverrides[semName] = val;
+  }
+  saveSettings();
+  closeFeeOverrideModal();
+  renderAll();
+});
+
+document.getElementById('btnFeeOverrideReset').addEventListener('click', ()=>{
+  const semName = document.getElementById('foSemester').value;
+  if(settings.semesterFeeOverrides) delete settings.semesterFeeOverrides[semName];
+  saveSettings();
+  closeFeeOverrideModal();
+  renderAll();
+});
 
 /* ---- Export / Import ---- */
 function exportData(){
@@ -1151,6 +2040,15 @@ function importData(file){
     records = validRecords;
     if(parsed.settings && typeof parsed.settings.targetCredits === 'number'){
       settings.targetCredits = parsed.settings.targetCredits;
+    }
+    if(parsed.settings && typeof parsed.settings.preferredElectiveTrail === 'string'){
+      settings.preferredElectiveTrail = parsed.settings.preferredElectiveTrail;
+    }
+    if(parsed.settings && typeof parsed.settings.targetCgpa === 'number'){
+      settings.targetCgpa = parsed.settings.targetCgpa;
+    }
+    if(parsed.settings && typeof parsed.settings.retakeExpectedGrade === 'string'){
+      settings.retakeExpectedGrade = parsed.settings.retakeExpectedGrade;
     }
     if(parsed.customMajors && typeof parsed.customMajors === 'object'){
       customMajors = parsed.customMajors;
@@ -1467,6 +2365,15 @@ document.getElementById('targetCredits').addEventListener('change', (e)=>{
   saveSettings();
   renderRecommendations();
 });
+
+const trailSelectElem = document.getElementById('recElectiveTrail');
+if(trailSelectElem){
+  trailSelectElem.addEventListener('change', (e)=>{
+    settings.preferredElectiveTrail = e.target.value;
+    saveSettings();
+    renderRecommendations();
+  });
+}
 
 /* =========================================================
    INIT
